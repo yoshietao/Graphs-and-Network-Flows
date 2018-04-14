@@ -22,5 +22,14 @@ plot(degree.distribution(g1),main="Degree distribution of the network with 1000 
 plot(degree.distribution(g2),main="Degree distribution of the network with 10000 nodes",xlab="Degree",ylab="Frequency",log='xy')
 
 #1-2e
-vcount(g1)
-neighbors(g1, 1)
+# x is a random vertex
+x <- sample(1:1000, 1)
+x
+n1 <- neighbors(g1, x)
+n1
+# this outputs a random neighbor of x
+sample(n1,1)
+
+#y <- sample(1:10000, 1)
+#n2 <- neighbors(g2, y)
+#length(n2)
