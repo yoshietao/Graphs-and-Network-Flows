@@ -8,7 +8,7 @@ library('pracma', lib="/Users/evelyn/Library/R")
 
 #1-2a
 g1 <- barabasi.game(1000, m=1, directed=F)
-plot(g1,vertex.size=8, vertex.label=NA)
+plot(g1,vertex.size=4, vertex.label=NA)
 is.connected(g1)
 
 #1-2b
@@ -17,7 +17,7 @@ modularity(fc)
 
 #1-2c
 g2 <- barabasi.game(10000, m=1, directed=F)
-plot(g2,vertex.size=8, vertex.label=NA)
+plot(g2,vertex.size=4, vertex.label=NA)
 fc2 <- cluster_fast_greedy(g2)
 modularity(fc2)
 
@@ -28,3 +28,8 @@ plot(degree.distribution(g2),main="Degree distribution of the network with 10000
 #1-2e
 vcount(g1)
 neighbors(g1, 1)
+
+#1-2f
+deg_age <-rev(degree(g2)[1:1000])
+print(deg_age)
+plot(deg_age,type='l',main="Degrees of the age 1 to 1000 with n=10000",xlab="Age",ylab="Degree")
