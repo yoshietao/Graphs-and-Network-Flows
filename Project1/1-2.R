@@ -1,3 +1,7 @@
+#install.packages("igraph",lib="/Users/evelyn/Library/R")
+#install.packages("Matrix",lib="/Users/evelyn/Library/R")
+#install.packages("pracma",lib="/Users/evelyn/Library/R")
+
 library('igraph', lib="/Users/evelyn/Library/R")
 library('Matrix', lib="/Users/evelyn/Library/R")
 library('pracma', lib="/Users/evelyn/Library/R")
