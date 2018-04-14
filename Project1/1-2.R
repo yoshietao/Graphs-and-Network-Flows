@@ -1,10 +1,12 @@
 #install.packages("igraph",lib="/Users/evelyn/Library/R")
 #install.packages("Matrix",lib="/Users/evelyn/Library/R")
 #install.packages("pracma",lib="/Users/evelyn/Library/R")
+#install.packages("data.table",lib="/Users/evelyn/Library/R")
 
 library('igraph', lib="/Users/evelyn/Library/R")
 library('Matrix', lib="/Users/evelyn/Library/R")
 library('pracma', lib="/Users/evelyn/Library/R")
+library('data.table', lib="/Users/evelyn/Library/R")
 
 #1-2a
 g1 <- barabasi.game(1000, m=1, directed=F)
@@ -26,14 +28,29 @@ plot(degree.distribution(g1),main="Degree distribution of the network with 1000 
 plot(degree.distribution(g2),main="Degree distribution of the network with 10000 nodes",xlab="Degree",ylab="Frequency",log='xy')
 
 #1-2e
-# x is a random vertex
-x <- sample(1:1000, 1)
-x
-n1 <- neighbors(g1, x)
-n1
-# this outputs a random neighbor of x
-sample(n1,1)
+func_1e <- function(g){
+  degreeVec <- c()
+  for(i in 1:2000) {
+    if(g == "g1") {
+      n <- 1000
+      x <- sample(1:n, 1)
+      n1 <- neighbors(g1, x)
+      j <- sample(n1,1)
+      degreeVec <- c(degreeVec, degree(g1,j))
+    }
+    if(g == "g2") {
+      n <- 10000
+      x <- sample(1:n)
+      n1 <- neighbors(g2, x)
+      j <- sample(n1,1)
+      degreeVec <- c(degreeVec, degree(g2,j))
+    }
+  }
+  degrees <- data.table(value = degreeVec)
+  freqs <- degrees[, .(N = .N), by = value][, freq := N / sum(N)]
+  setorder(freqs, value)
+  plot(freqs$value, freqs$freq, log='xy', main=paste("Degree distribution of the network with", n, "nodes"), xlab="Degree",ylab="Frequency")
+}
 
-#y <- sample(1:10000, 1)
-#n2 <- neighbors(g2, y)
-#length(n2)
+func_1e("g1")
+func_1e("g2")
