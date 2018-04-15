@@ -27,7 +27,15 @@ func_atof <- function(m){
   #1-2d
   plot(degree.distribution(g1),main="Degree distribution of the network with 1000 nodes",xlab="Degree",ylab="Frequency",log='xy')
   plot(degree.distribution(g2),main="Degree distribution of the network with 10000 nodes",xlab="Degree",ylab="Frequency",log='xy')
-
+  print(length(degree.distribution(g1)))
+  x = log(seq(1:length(degree.distribution(g1))))
+  y = log(degree.distribution(g1))
+  plot(x,y)
+  
+  x = log(seq(1:length(degree.distribution(g2))))
+  y = log(degree.distribution(g2))
+  plot(x,y)
+  
   #1-2e
   func_1e <- function(g){
     degreeVec <- c()
@@ -51,6 +59,7 @@ func_atof <- function(m){
     freqs <- degrees[, .(N = .N), by = value][, freq := N / sum(N)]
     setorder(freqs, value)
     plot(freqs$value, freqs$freq, log='xy', main=paste("Degree distribution of the network with", n, "nodes"), xlab="Degree",ylab="Frequency")
+    plot(log(freqs$freq),log(freqs$value))
   }
   
   func_1e("g1")
@@ -59,17 +68,12 @@ func_atof <- function(m){
   #1-2f
   deg_age <-rev(degree(g2)[1:1000])
   plot(deg_age,type='l',main="Degrees of the age 1 to 1000 with n=10000",xlab="Age",ylab="Degree")
-  return (modularity(fc))
 }
 
 #1-2g
-mod1 <- func_atof(1)
-mod2 <- func_atof(2)
-mod3 <- func_atof(5)
-
-print(mod1)
-print(mod2)
-print(mod3)
+func_atof(1)
+func_atof(2)
+func_atof(5)
 
 #1-2h
 g3 <- barabasi.game(1000, m=1, directed=F)

@@ -10,7 +10,7 @@ plot(degree.distribution(g1),main="Degree distribution of 1-3",xlab="Degree",yla
 #dev.off()
 
 plot(degree.distribution(g1),main="Degree distribution-loglog of 1-3",xlab="Degree",ylab="Frequency",log='xy')
-print(degree.distribution(g1))
+plot(log(seq(1:length(degree.distribution(g1)))),log(degree.distribution(g1)))
 #dev.copy(jpeg,'/Volumes/Transcend/UCLA/232E/project/Project1/1-3a_degree_distribution_loglog.jpg')
 #dev.off()
 
