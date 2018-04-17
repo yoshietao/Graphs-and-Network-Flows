@@ -41,37 +41,42 @@ random_walk = function (g, num_steps, start_node, transition_matrix = NULL){
   return(v)
 }
 
-#2-2a
+#2-2d 
+n_list = list(100,1000,10000)
 
-n <- 1000
-g1 <- barabasi.game(n, m=1, directed=F)
-plot(g1,vertex.size=4, vertex.label=NA)
+for (n in n_list){
 
-#2-2b
-
-s_t_list = c()
-va_list = c()
-
-t_range = 1:20
-sample_times = 20
-
-trans_mat <- create_transition_matrix(g1)
-paths_ <- shortest.paths(g1)
-
-for (t in t_range) {
-  dists = c()
-  samp = sample(1:n, sample_times)
-  for (s in samp) {
-    d = random_walk(g1, t, s, trans_mat)
-    dists = c(dists, paths_[s,d])
-  }
-  s_t_list = c(s_t_list, mean(dists))
-  va_list = c(va_list, var(dists))
+  #2-2a
   
+  g1 <- barabasi.game(n, m=1, directed=F)
+  plot(g1,vertex.size=4, vertex.label=NA)
+  
+  #2-2b
+  
+  s_t_list = c()
+  va_list = c()
+  
+  t_range = 1:20
+  sample_times = 20
+  
+  trans_mat <- create_transition_matrix(g1)
+  paths_ <- shortest.paths(g1)
+  
+  for (t in t_range) {
+    dists = c()
+    samp = sample(1:n, sample_times)
+    for (s in samp) {
+      d = random_walk(g1, t, s, trans_mat)
+      dists = c(dists, paths_[s,d])
+    }
+    s_t_list = c(s_t_list, mean(dists))
+    va_list = c(va_list, var(dists))
+    
+  }
+  #png(sprintf("p2b_%f_st.png", n), 900, 900)
+  plot(t_range, s_t_list, main = paste("Average distance vs time with", n, "nodes"), xlab = "t", ylab = "Mean Shortest Distance")
+  #dev.off()
+  #png(sprintf("p2b_%f_ot.png", n), 900, 900)
+  plot(t_range, va_list, main = paste("Variance vs time with", n, "nodes"), xlab="t", ylab="Variance of Shortest Distance")
+  #dev.off()
 }
-#png(sprintf("p2b_%f_st.png", n), 900, 900)
-plot(t_range, s_t_list, main = "Average distance vs time", xlab = "t", ylab = "Mean Shortest Distance")
-#dev.off()
-#png(sprintf("p2b_%f_ot.png", n), 900, 900)
-plot(t_range, va_list, main = "Variance vs time", xlab="t", ylab="Variance of Shortest Distance")
-#dev.off()
