@@ -8,8 +8,6 @@ library('Matrix', lib="/Users/evelyn/Library/R")
 library('pracma', lib="/Users/evelyn/Library/R")
 library('data.table', lib="/Users/evelyn/Library/R")
 
-
-
 #functions from ccle
 
 create_transition_matrix = function (g){
@@ -23,7 +21,6 @@ create_transition_matrix = function (g){
   z = matrix(rowSums(adj, , 1))
   
   transition_matrix = adj / repmat(z, 1, n)  # normalize to get probabilities
-  
   return(transition_matrix)
 }
 
@@ -33,7 +30,7 @@ random_walk = function (g, num_steps, start_node, transition_matrix = NULL){
   
   v = start_node
   for(i in 1:num_steps){
-    fprintf('Step %d: %d\n', i, v)  # COMMENT THIS
+    #fprintf('Step %d: %d\n', i, v)  # COMMENT THIS
     PMF = transition_matrix[v, ]
     v = sample(1:vcount(g), 1, prob = PMF)        
   }
@@ -73,29 +70,32 @@ for (n in n_list){
     va_list = c(va_list, var(dists))
 
   }
-  png(sprintf("2-2bd_%f_st.png", n), 900, 900)
   plot(t_range, s_t_list, main = paste("Average distance vs time with", n, "nodes"), xlab = "t", ylab = "Mean Shortest Distance")
-  dev.off()
-  png(sprintf("2-2bd_%f_vt.png", n), 900, 900)
   plot(t_range, va_list, main = paste("Variance vs time with", n, "nodes"), xlab="t", ylab="Variance of Shortest Distance")
-  dev.off()
 }
 
 #2-2c
 #degree distribution of graph
 g2 <- barabasi.game(1000, m=1, directed=F)
-degree_dist = degree_distribution(g2)
-barplot(degree_dist, names.arg = 1:length(degree_dist), main = sprintf("Degree Distribution for graph"), xlab = "Degrees")
+plot(degree.distribution(g2),main="Degree distribution of the network",xlab="Degree",ylab="Frequency")
 
-#degree distribution of end of random walk 
-sample_times = 20
-t_limit = 20
-trans_mat <- create_transition_matrix(g2)
-graph_degrees <- degree(g2)
-samp = sample(1:1000, sample_times)
+#degree distribution of end of random walk
+t_range = 1:20
 samp_deg = c()
-for (s in samp) {
-  d = random_walk(g2, t_limit, s, trans_mat)
-  samp_deg = c (samp_deg, graph_degrees[d])
+for (t in t_range) {
+  sample_times = 20
+  t_limit = 20
+  trans_mat <- create_transition_matrix(g2)
+  graph_degrees <- degree(g2)
+  samp = sample(1:1000, sample_times)
+  #samp_deg = c()
+  for (s in samp) {
+    d = random_walk(g2, t_limit, s, trans_mat)
+    samp_deg = c (samp_deg, graph_degrees[d])
+  }
 }
-hist(samp_deg, main="Random Walk Degree Distribution", xlab="degree")
+
+degrees <- data.table(value = samp_deg)
+freqs <- degrees[, .(N = .N), by = value][, freq := N / sum(N)]
+setorder(freqs, value)
+plot(freqs$value, freqs$freq, main=paste("Degree dist. for random walk"), xlab="Degree",ylab="Frequency")
