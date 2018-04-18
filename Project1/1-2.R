@@ -71,9 +71,9 @@ func_atof <- function(m){
 }
 
 #1-2g
-func_atof(1)
-func_atof(2)
-func_atof(5)
+# func_atof(1)
+# func_atof(2)
+# func_atof(5)
 
 #1-2h
 g3 <- barabasi.game(1000, m=1, directed=F)
@@ -85,7 +85,7 @@ plot(fc3,g3,vertex.size=4,vertex.label=NA)
 print(modularity(fc3))
 
 #g4 <- sample_degseq(deg_seq,method='simple.no.multiple')
-g4 <- sample_degseq(deg_seq,method='vl')
+g4 <- sample_degseq(deg_seq,method='simple.no.multiple')
 #plot(g4,vertex.size=4, vertex.label=NA)
 
 fc4 <- cluster_fast_greedy(g4)
