@@ -53,7 +53,7 @@ random_walk = function (g, num_steps, start_node, t1, t2, alpha=0){
 
 #2-3a
 g = sample_pa(1000,m=4)
-trans_mat <- create_transition_matrix(g1)
+#trans_mat <- create_transition_matrix(g1)
 p = matrix(0,1,1000)
 
 adj = as_adjacency_matrix(g)
