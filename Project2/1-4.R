@@ -23,6 +23,7 @@ common_neighbors = function(sg, v, i, len_Ri){
   re = sort(CNeighbor, decreasing = TRUE, index.return=TRUE)
   return(v[re$ix[1:len_Ri]])
 }
+
 Jaccard = function(sg, v, i, len_Ri){
   Si = neighbors(sg,i)
   CNeighbor = c()
@@ -34,7 +35,21 @@ Jaccard = function(sg, v, i, len_Ri){
   return(v[re$ix[1:len_Ri]])
 }
 
-
+adamic = function(sg, v, i, len_Ri){
+  Si = neighbors(sg,i)
+  CNeighbor = c()
+  for(j in v){
+    Sj = neighbors(sg, j)
+    inter = intersection(Si,Sj)
+    summ = 0
+    for(k in inter){
+      summ = summ + 1/log10(length(neighbors(sg,k)))
+    }
+    CNeighbor = c(CNeighbor, summ)
+  }
+  re = sort(CNeighbor, decreasing = TRUE, index.return=TRUE)
+  return(v[re$ix[1:len_Ri]])
+}
 
 # convert the edge list into a list
 graph_list = c() 
@@ -85,14 +100,14 @@ for (i in list_24){
   nei <- neigh[t]
   t <- !(v %in% nei)
   # common neighbors
-  Pi <- common_neighbors(sg,v[t],i,len_Ri)
-  measure1 <- c(measure1, handle_144(Ri,Pi))
+  #Pi <- common_neighbors(sg,v[t],i,len_Ri)
+  #measure1 <- c(measure1, handle_144(Ri,Pi))
   # Jaccard
-  Pi <- Jaccard(sg,v[t],i,len_Ri)
-  measure2 <- c(measure1, handle_144(Ri,Pi))
+  #Pi <- Jaccard(sg,v[t],i,len_Ri)
+  #measure2 <- c(measure1, handle_144(Ri,Pi))
   #adamic
-  #Pi <- adamic(sg,v[t],i,len_Ri)
-  #measure3 <- c(measure1, handle_144(Ri,Pi))
+  Pi <- adamic(sg,v[t],i,len_Ri)
+  measure3 <- c(measure1, handle_144(Ri,Pi))
 
 }
 
