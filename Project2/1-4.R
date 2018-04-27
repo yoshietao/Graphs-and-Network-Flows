@@ -88,31 +88,37 @@ measure1 <- c()
 measure2 <- c()
 measure3 <- c()
 
-for (i in list_24){
-  neigh <- neighbors(sg,i)
-  p <- runif(length(neigh),0,1)
-  # Ri is a list of friends deleted 
-  Ri <- neigh[which(p<0.25)]
-  len_Ri <- length(Ri)
-  
-  #preprocess nodes that belongs to j
-  t <- !(neigh %in% Ri)
-  nei <- neigh[t]
-  t <- !(v %in% nei)
-  # common neighbors
-  #Pi <- common_neighbors(sg,v[t],i,len_Ri)
-  #measure1 <- c(measure1, handle_144(Ri,Pi))
-  # Jaccard
-  #Pi <- Jaccard(sg,v[t],i,len_Ri)
-  #measure2 <- c(measure1, handle_144(Ri,Pi))
-  #adamic
-  Pi <- adamic(sg,v[t],i,len_Ri)
-  measure3 <- c(measure1, handle_144(Ri,Pi))
 
+for(trial in 1:10){
+  for (i in list_24){
+    neigh <- neighbors(sg,i)
+    p <- runif(length(neigh),0,1)
+    # Ri is a list of friends deleted 
+    Ri <- neigh[which(p<0.25)]
+    len_Ri <- length(Ri)
+    
+    #preprocess nodes that belongs to j
+    t <- !(neigh %in% Ri)
+    nei <- neigh[t]
+    t <- !(v %in% nei)
+    # common neighbors
+    Pi <- common_neighbors(sg,v[t],i,len_Ri)
+    measure1 <- c(measure1, handle_144(Ri,Pi))
+    # Jaccard
+    Pi <- Jaccard(sg,v[t],i,len_Ri)
+    measure2 <- c(measure1, handle_144(Ri,Pi))
+    #adamic
+    Pi <- adamic(sg,v[t],i,len_Ri)
+    measure3 <- c(measure1, handle_144(Ri,Pi))
+    
+  }
 }
 
-#intersection(n1,n7)
-#length(intersection(n1,n7))
-#union(n1,n7)
-#length(union(n1,n7))
+acc1 <- mean(measure1)
+acc2 <- mean(measure2)
+acc3 <- mean(measure3)
+
+
+
+
 
