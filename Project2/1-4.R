@@ -3,7 +3,18 @@ library('Matrix')
 library('pracma')
 library('data.table')
 
-file = 'Project2/facebook_combined.txt'
+file = 'facebook_combined.txt'
+
+common_neighbors = function(sg, v, i, len_Ri){
+  Si = neighbors(sg,i)
+  CNeighbor = c()
+  for(j in v){
+    Sj = neighbors(sg, j)
+    CNeighbor = c(CNeighbor, length(intersection(Si,Sj)))
+  }
+  re = sort(CNeighbor, decreasing = TRUE, index.return=TRUE)
+  return(v[re$ix[1:len_Ri]])
+}
 
 # convert the edge list into a list
 graph_list = c() 
@@ -35,14 +46,23 @@ list_24
 # compute the length of the list
 length(list_24)
 
+#vertices in personalized network centered at 415
+v = V(sg)
+
 for (i in list_24){
-  neigh <- neighbors(g,i)
+  neigh <- neighbors(sg,i)
   p <- runif(length(neigh),0,1)
   # Ri is a list of friends deleted 
-  Ri <- which(p<0.25)
+  Ri <- neigh[which(p<0.25)]
   len_Ri <- length(Ri)
-  # 
-  #Pi <- common_neighbors(neigh,len_Ri)
+  print(len_Ri)
+  print(Ri)
+  #
+  t <- !(neigh %in% Ri)
+  nei <- neigh[t]
+  t <- !(v %in% nei)
+  Pi <- common_neighbors(sg,v[t],i,len_Ri)
+  print(Pi)
 }
 
 #intersection(n1,n7)
