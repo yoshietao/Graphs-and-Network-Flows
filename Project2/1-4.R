@@ -5,6 +5,14 @@ library('data.table')
 
 file = 'facebook_combined.txt'
 
+handle_144 = function(Ri,Pi){
+  print(Ri)
+  print(Pi)
+  acc = length(intersect(Ri,Pi))/length(Ri)
+  print(acc)
+  return (acc)
+}
+
 common_neighbors = function(sg, v, i, len_Ri){
   Si = neighbors(sg,i)
   CNeighbor = c()
@@ -15,6 +23,18 @@ common_neighbors = function(sg, v, i, len_Ri){
   re = sort(CNeighbor, decreasing = TRUE, index.return=TRUE)
   return(v[re$ix[1:len_Ri]])
 }
+Jaccard = function(sg, v, i, len_Ri){
+  Si = neighbors(sg,i)
+  CNeighbor = c()
+  for(j in v){
+    Sj = neighbors(sg, j)
+    CNeighbor = c(CNeighbor, length(intersection(Si,Sj))/length(union(Si,Sj)))
+  }
+  re = sort(CNeighbor, decreasing = TRUE, index.return=TRUE)
+  return(v[re$ix[1:len_Ri]])
+}
+
+
 
 # convert the edge list into a list
 graph_list = c() 
@@ -49,20 +69,31 @@ length(list_24)
 #vertices in personalized network centered at 415
 v = V(sg)
 
+measure1 <- c()
+measure2 <- c()
+measure3 <- c()
+
 for (i in list_24){
   neigh <- neighbors(sg,i)
   p <- runif(length(neigh),0,1)
   # Ri is a list of friends deleted 
   Ri <- neigh[which(p<0.25)]
   len_Ri <- length(Ri)
-  print(len_Ri)
-  print(Ri)
-  #
+  
+  #preprocess nodes that belongs to j
   t <- !(neigh %in% Ri)
   nei <- neigh[t]
   t <- !(v %in% nei)
+  # common neighbors
   Pi <- common_neighbors(sg,v[t],i,len_Ri)
-  print(Pi)
+  measure1 <- c(measure1, handle_144(Ri,Pi))
+  # Jaccard
+  Pi <- Jaccard(sg,v[t],i,len_Ri)
+  measure2 <- c(measure1, handle_144(Ri,Pi))
+  #adamic
+  #Pi <- adamic(sg,v[t],i,len_Ri)
+  #measure3 <- c(measure1, handle_144(Ri,Pi))
+
 }
 
 #intersection(n1,n7)
