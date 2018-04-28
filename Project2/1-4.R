@@ -6,10 +6,10 @@ library('data.table')
 file = 'facebook_combined.txt'
 
 handle_144 = function(Ri,Pi){
-  print(Ri)
-  print(Pi)
+  #print(Ri)
+  #print(Pi)
   acc = length(intersect(Ri,Pi))/length(Ri)
-  print(acc)
+  #print(acc)
   return (acc)
 }
 
@@ -106,10 +106,10 @@ for(trial in 1:10){
     measure1 <- c(measure1, handle_144(Ri,Pi))
     # Jaccard
     Pi <- Jaccard(sg,v[t],i,len_Ri)
-    measure2 <- c(measure1, handle_144(Ri,Pi))
+    measure2 <- c(measure2, handle_144(Ri,Pi))
     #adamic
     Pi <- adamic(sg,v[t],i,len_Ri)
-    measure3 <- c(measure1, handle_144(Ri,Pi))
+    measure3 <- c(measure3, handle_144(Ri,Pi))
     
   }
 }
@@ -117,6 +117,7 @@ for(trial in 1:10){
 acc1 <- mean(measure1)
 acc2 <- mean(measure2)
 acc3 <- mean(measure3)
+
 
 
 
