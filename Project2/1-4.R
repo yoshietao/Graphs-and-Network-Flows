@@ -6,10 +6,10 @@ library('data.table')
 file = 'facebook_combined.txt'
 
 handle_144 = function(Ri,Pi){
-  print(Ri)
-  print(Pi)
+  #print(Ri)
+  #print(Pi)
   acc = length(intersect(Ri,Pi))/length(Ri)
-  print(acc)
+  #print(acc)
   return (acc)
 }
 
@@ -23,6 +23,7 @@ common_neighbors = function(sg, v, i, len_Ri){
   re = sort(CNeighbor, decreasing = TRUE, index.return=TRUE)
   return(v[re$ix[1:len_Ri]])
 }
+
 Jaccard = function(sg, v, i, len_Ri){
   Si = neighbors(sg,i)
   CNeighbor = c()
@@ -34,7 +35,21 @@ Jaccard = function(sg, v, i, len_Ri){
   return(v[re$ix[1:len_Ri]])
 }
 
-
+adamic = function(sg, v, i, len_Ri){
+  Si = neighbors(sg,i)
+  CNeighbor = c()
+  for(j in v){
+    Sj = neighbors(sg, j)
+    inter = intersection(Si,Sj)
+    summ = 0
+    for(k in inter){
+      summ = summ + 1/log10(length(neighbors(sg,k)))
+    }
+    CNeighbor = c(CNeighbor, summ)
+  }
+  re = sort(CNeighbor, decreasing = TRUE, index.return=TRUE)
+  return(v[re$ix[1:len_Ri]])
+}
 
 # convert the edge list into a list
 graph_list = c() 
@@ -73,31 +88,38 @@ measure1 <- c()
 measure2 <- c()
 measure3 <- c()
 
-for (i in list_24){
-  neigh <- neighbors(sg,i)
-  p <- runif(length(neigh),0,1)
-  # Ri is a list of friends deleted 
-  Ri <- neigh[which(p<0.25)]
-  len_Ri <- length(Ri)
-  
-  #preprocess nodes that belongs to j
-  t <- !(neigh %in% Ri)
-  nei <- neigh[t]
-  t <- !(v %in% nei)
-  # common neighbors
-  Pi <- common_neighbors(sg,v[t],i,len_Ri)
-  measure1 <- c(measure1, handle_144(Ri,Pi))
-  # Jaccard
-  Pi <- Jaccard(sg,v[t],i,len_Ri)
-  measure2 <- c(measure1, handle_144(Ri,Pi))
-  #adamic
-  #Pi <- adamic(sg,v[t],i,len_Ri)
-  #measure3 <- c(measure1, handle_144(Ri,Pi))
 
+for(trial in 1:10){
+  for (i in list_24){
+    neigh <- neighbors(sg,i)
+    p <- runif(length(neigh),0,1)
+    # Ri is a list of friends deleted 
+    Ri <- neigh[which(p<0.25)]
+    len_Ri <- length(Ri)
+    
+    #preprocess nodes that belongs to j
+    t <- !(neigh %in% Ri)
+    nei <- neigh[t]
+    t <- !(v %in% nei)
+    # common neighbors
+    Pi <- common_neighbors(sg,v[t],i,len_Ri)
+    measure1 <- c(measure1, handle_144(Ri,Pi))
+    # Jaccard
+    Pi <- Jaccard(sg,v[t],i,len_Ri)
+    measure2 <- c(measure2, handle_144(Ri,Pi))
+    #adamic
+    Pi <- adamic(sg,v[t],i,len_Ri)
+    measure3 <- c(measure3, handle_144(Ri,Pi))
+    
+  }
 }
 
-#intersection(n1,n7)
-#length(intersection(n1,n7))
-#union(n1,n7)
-#length(union(n1,n7))
+acc1 <- mean(measure1)
+acc2 <- mean(measure2)
+acc3 <- mean(measure3)
+
+
+
+
+
 
