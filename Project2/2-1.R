@@ -5,7 +5,7 @@ library('data.table')
 
 DO_18 = FALSE; 
 DO_19 = FALSE;
-DO_20 = TRUE;
+DO_20 = FALSE;
 
 # Problem 18 
 # create directed personal networks for users who have more than 2 circles
@@ -44,8 +44,21 @@ extension <- ".edges"
 for (node_num in node_list){
     graph_list = c() 
     d <- read.table(paste0(path,node_num,extension), sep = " ")
+    # d <- read.table("test.txt", sep = " ")
+    # add edges from ego node to all other nodes 
+    graph_list = c() 
+    for (i in 1:dim(d)[1]){
+      for (j in 1:dim(d)[2]){
+        graph_list = c(graph_list, d[i,j])
+      }
+    }
+    for (unique_node in unique(graph_list)){
+      d <- rbind( d, data.frame("V1"=node_num, "V2"=unique_node))
+    }
+    # create directed graph from data frame
     g <- graph_from_data_frame(d,directed=TRUE)
-    # plot(g, vertex.size=4, vertex.label=NA)
+    plot(g, vertex.size=4, vertex.label=NA)
+    
   if (DO_19){
     # Problem 19
     # plot degree distribution for out degree 
