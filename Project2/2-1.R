@@ -4,7 +4,7 @@ library('pracma')
 library('data.table')
 
 DO_18 = FALSE; 
-DO_19 = FALSE;
+DO_19 = TRUE;
 DO_20 = FALSE;
 
 # Problem 18 
@@ -62,16 +62,9 @@ for (node_num in node_list){
   if (DO_19){
     # Problem 19
     # plot degree distribution for out degree 
-    degrees <- degree(g, mode="out")
-    degreeNum <- as.numeric(names(degrees))
-    degreeFreq <- unname(degrees)/sum(degrees)
-    plot(degreeNum, degreeFreq,main=paste("Degree Distribution for out-degree for node", node_num),xlab="Degree",ylab="Frequency")
-    
+    plot(degree.distribution(g,mode="out"), main=paste("Degree Distribution for out-degree for node", node_num),xlab="Degree",ylab="Frequency", cex = 0.7, cex.axis=0.8, cex.main=0.7)
     # plot degree distribution for in degree 
-    degrees <- degree(g, mode="in")
-    degreeNum <- as.numeric(names(degrees))
-    degreeFreq <- unname(degrees)/sum(degrees)
-    plot(degreeNum, degreeFreq,main=paste("Degree Distribution for in-degree for node", node_num),xlab="Degree",ylab="Frequency")
+    plot(degree.distribution(g,mode="in"),main=paste("Degree Distribution for in-degree for node", node_num),xlab="Degree",ylab="Frequency", cex = 0.7, cex.axis=0.8,cex.main=0.7)
   }
   if (DO_20){
     # Problem 20
