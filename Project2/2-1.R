@@ -82,7 +82,14 @@ for (node_num in node_list){
   if (D0_22){
     d <- read.table(paste0(path,node_num,".edges"), sep = " ")
     dcircle <- read.table(paste0(path,node_num,".circles"), sep = "\t", fill = TRUE)
+    d0 = c()
+    for(i in 1:dim(dcircle)[1]){
+      d0 = c(d0,as.numeric(dcircle[i,]))
+    }
+    d0 = unique(d0)
+    
     u = unique(c(d[,1],d[,2],as.numeric(node_num)))
+    #u = d0
     cc = matrix(0,length(u),dim(dcircle)[1])
     kk = matrix(0,length(u),length(cluster))
     k_ = membership(cluster)
