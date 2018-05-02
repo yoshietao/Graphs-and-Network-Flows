@@ -2,10 +2,15 @@ library('igraph')
 library('Matrix')
 library('pracma')
 library('data.table')
+#install.packages('infotheo')
+#install.packages('dummies')
+library('dummies')
+library('infotheo')
 
 DO_18 = FALSE; 
 DO_19 = TRUE;
-DO_20 = FALSE;
+DO_20 = TRUE;
+D0_22 = TRUE;
 
 # Problem 18 
 # create directed personal networks for users who have more than 2 circles
@@ -53,11 +58,11 @@ for (node_num in node_list){
       }
     }
     for (unique_node in unique(graph_list)){
-      d <- rbind( d, data.frame("V1"=node_num, "V2"=unique_node))
+      d <- rbind( d, data.frame("V1"=as.numeric(node_num), "V2"=unique_node))
     }
     # create directed graph from data frame
     g <- graph_from_data_frame(d,directed=TRUE)
-    plot(g, vertex.size=4, vertex.label=NA)
+    #plot(g, vertex.size=4, vertex.label=NA)
     
   if (DO_19){
     # Problem 19
@@ -70,8 +75,42 @@ for (node_num in node_list){
     # Problem 20
     cluster <- cluster_walktrap(g)
     # plot communities using color
-    plot(cluster, g, vertex.label = NA, vertex.size = 3, main=paste("2.1 Graph (Walktrap) for node", node_num))
+    plot(cluster, g, vertex.label = NA, vertex.size = 3, edge.color = 'black', edge.width=0.05, edge.arrow.size=0.01, main=paste("2.1 Graph (Walktrap) for node", node_num))
     # modularity score
     print(sprintf("2.1 Modularity (Walktrap) for node %s: %f", node_num, modularity(cluster)))
+  }
+  if (D0_22){
+    d <- read.table(paste0(path,node_num,".edges"), sep = " ")
+    dcircle <- read.table(paste0(path,node_num,".circles"), sep = "\t", fill = TRUE)
+    u = unique(c(d[,1],d[,2],as.numeric(node_num)))
+    cc = matrix(0,length(u),dim(dcircle)[1])
+    kk = matrix(0,length(u),length(cluster))
+    k_ = membership(cluster)
+    dfk = data.frame("K"=c(k_))
+    for(i in 1:length(k_))
+      kk[i,dfk[i,]]=1
+    
+    for(j in 1:dim(dcircle)[1]){
+      for (i in 1:(length(k_))){
+        if (rownames(dfk)[i] %in% dcircle[j,])
+          cc[i,j] = 1
+      }
+      cc[which(rownames(dfk)==as.numeric(node_num)),j]=1
+    }
+    
+    K = data.frame("K"=kk)
+    C = data.frame("C"=cc)
+    
+    for(i in 1:dim(dcircle)[1])
+      plot(cluster, g, col=as.factor(cc[,i]), vertex.label = NA, vertex.size = 3, edge.color = 'black', edge.width=0.05, edge.arrow.size=0.01, main=paste("2.1 Graph (Walktrap) for node", node_num))
+    
+    Hcgk = condentropy(C,K)
+    Hkgc = condentropy(K,C)
+    Hc   = entropy(C)
+    Hk   = entropy(K)
+    h = 1-Hcgk/Hc
+    c = 1-Hkgc/Hk
+    print(sprintf("2.1 homogeneity for node %s: %f", node_num, h))
+    print(sprintf("2.1 completeness for node %s: %f", node_num, c))
   }
 }
