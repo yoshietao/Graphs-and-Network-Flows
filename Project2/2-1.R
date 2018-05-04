@@ -46,7 +46,7 @@ node_list <- c("109327480479767108490",
                "115625564993990145546",
                "101373961279443806744")
 extension <- ".edges"
-for (node_num in node_list){
+for (node_num in node_list[3]){
     graph_list = c() 
     d <- read.table(paste0(path,node_num,extension), sep = " ")
     # d <- read.table("test.txt", sep = " ")
@@ -80,36 +80,36 @@ for (node_num in node_list){
     print(sprintf("2.1 Modularity (Walktrap) for node %s: %f", node_num, modularity(cluster)))
   }
   if (D0_22){
-    d <- read.table(paste0(path,node_num,".edges"), sep = " ")
+    #d <- read.table(paste0(path,node_num,".edges"), sep = " ")
     dcircle <- read.table(paste0(path,node_num,".circles"), sep = "\t", fill = TRUE)
     d0 = c()
-    for(i in 1:dim(dcircle)[1]){
+    for(i in 1:dim(dcircle)[2]){
       d0 = c(d0,as.numeric(dcircle[i,]))
     }
-    d0 = unique(d0)
-    
-    u = unique(c(d[,1],d[,2],as.numeric(node_num)))
-    #u = d0
+    u = unique(d0)
+    u[1] = as.numeric(node_num)
+    g_ = induced.subgraph(g,as.numeric(V(g)[names(V(g)) %in% u]))
+    cluster <- cluster_walktrap(g_)
+    plot(cluster, g_, vertex.label = NA, vertex.size = 3, edge.color = 'black', edge.width=0.05, edge.arrow.size=0.01, main=paste("2.1 Graph (Walktrap) for node", node_num))
+  
     cc = matrix(0,length(u),dim(dcircle)[1])
     kk = matrix(0,length(u),length(cluster))
     k_ = membership(cluster)
     dfk = data.frame("K"=c(k_))
-    for(i in 1:length(k_))
-      kk[i,dfk[i,]]=1
-    
-    for(j in 1:dim(dcircle)[1]){
-      for (i in 1:(length(k_))){
-        if (rownames(dfk)[i] %in% dcircle[j,])
+    for(i in 1:length(u)){
+      ind = which(rownames(dfk)==u[i])
+      kk[i,dfk[ind,]] = 1
+      for(j in 1:dim(dcircle)[1]){
+        if(u[i] %in% dcircle[j,])
           cc[i,j] = 1
       }
-      cc[which(rownames(dfk)==as.numeric(node_num)),j]=1
     }
     
     K = data.frame("K"=kk)
     C = data.frame("C"=cc)
     
     for(i in 1:dim(dcircle)[1])
-      plot(cluster, g, col=as.factor(cc[,i]), vertex.label = NA, vertex.size = 3, edge.color = 'black', edge.width=0.05, edge.arrow.size=0.01, main=paste("2.1 Graph (Walktrap) for node", node_num))
+      plot(cluster, g_, col=as.factor(names(k_) %in% dcircle[i,]), vertex.label = NA, vertex.size = 3, edge.color = 'black', edge.width=0.05, edge.arrow.size=0.01, main=paste("2.1 Graph (Walktrap) for node", node_num))
     
     Hcgk = condentropy(C,K)
     Hkgc = condentropy(K,C)
