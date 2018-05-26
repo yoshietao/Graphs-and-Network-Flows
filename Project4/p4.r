@@ -1,0 +1,6 @@
+library(igraph)
+d<-read.table("test.txt")
+d <- as.matrix(d)
+g <- graph_from_edgelist(d[,1:2])
+E(g)$weight=as.numeric(d[,3])
+plot(g,edge.label=E(g)$weight)
