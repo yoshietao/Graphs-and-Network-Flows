@@ -7,12 +7,12 @@ def Q1():
 	uniq_act = OrderedDict()
 	act_movie = defaultdict(list)
 	Num_actor_actress = 0
-	uniq_movie = {}
+	Num_unique_movies = 0
+	uniq_movie = OrderedDict()
 	# save actor_movies.txt and actress_movies.txt in folder project4_data
 
 	# merge actor_movies.txt and actress_movies.txt to combined.txt
 	file_names = ["project4_data/actor_movies.txt", "project4_data/actress_movies.txt"]
-	outfile =  open('project4_data/combined.txt','w',encoding="ISO-8859-1")
 	for f in file_names:
 		with open (f,'r',encoding="ISO-8859-1") as infile:
 			for line in infile:
@@ -25,7 +25,9 @@ def Q1():
 					tmp_tokens = []
 					for mov in tokens[1:]:
 						sp = mov.strip('  ').split('  ')[0]
-						uniq_movie[sp] = True
+						if sp not in uniq_movie:
+							uniq_movie[sp] = Num_unique_movies
+							Num_unique_movies += 1
 						tmp_tokens.append(sp)
 					#detect duplicate actors and actresses
 					if tokens[0] not in uniq_act:
@@ -35,24 +37,29 @@ def Q1():
 					else:
 						act_movie[tokens[0]].extend(tmp_tokens)
 	
-	Num_unique_movies = len(uniq_movie)
 	print('Number of unique movies:', Num_unique_movies)
 	print('Number of actors and actresses:', Num_actor_actress)
 
-	#create adjacency matrix
-	adjacency_matrix = np.zeros([Num_actor_actress,Num_actor_actress])
-	for act1,id1 in uniq_act.items():
-		for act2,id2 in uniq_act.items():
-			intersect = [val for val in act_movie[act1] if val in act_movie[act2]]
-			adjacency_matrix[id1,id2] = len(intersect)/len(act_movie[act1])
-			print(adjacency_matrix[id1,id2])
+	#rev_uniq_movie = {v: k for k, v in uniq_movie.items()}
 
-	#Output adjacency matrix:
-	print('Output adjacency matrix...')
-	for i in Num_actor_actress:
-		for j in Num_actor_actress:
-			outfile.write(adjacency_matrix[i,j]+' ')
-		outfile.write(' \n')
+	
+	act_movie2 = np.zeros([Num_actor_actress,Num_unique_movies])
+	for act,i in uniq_act.items():
+		for m in act_movie[act]:
+			act_movie2[i,uniq_movie[m]] = 1
+	
+	outfile =  open('project4_data/edge_list1.txt','w',encoding="ISO-8859-1")
+
+	print('create edge list...')
+	for i in range(Num_unique_movies):
+		x = act_movie2[:,i]
+		index = np.where(x==1)[0]
+
+		for j in index:
+			for k in index:
+				if j != k:
+					outfile.write(str(j)+' '+str(k)+' '+str(sum(np.multiply(act_movie2[j],act_movie2[k]))/sum(act_movie2[j]))+'\n')
+
 
 if __name__ == '__main__':
 	Q1()
