@@ -41,14 +41,18 @@ def Q1():
 	print('Number of actors and actresses:', Num_actor_actress)
 
 	#rev_uniq_movie = {v: k for k, v in uniq_movie.items()}
-
+	rev_uniq_act = {v: k for k, v in uniq_act.items()}
 	
 	act_movie2 = np.zeros([Num_actor_actress,Num_unique_movies])
 	for act,i in uniq_act.items():
 		for m in act_movie[act]:
 			act_movie2[i,uniq_movie[m]] = 1
 	
-	outfile =  open('project4_data/edge_list1.txt','w',encoding="ISO-8859-1")
+	outfile =  open('project4_data/edge_list2.txt','w',encoding="ISO-8859-1")
+
+	act_movie_len = np.zeros(Num_actor_actress)
+	for a,i in uniq_act.items():
+		act_movie_len[i] = len(act_movie[a])
 
 	print('create edge list...')
 	for i in range(Num_unique_movies):
@@ -58,8 +62,9 @@ def Q1():
 		for j in index:
 			for k in index:
 				if j != k:
-					outfile.write(str(j)+' '+str(k)+' '+str(sum(np.multiply(act_movie2[j],act_movie2[k]))/sum(act_movie2[j]))+'\n')
-
+					#outfile.write(str(j)+' '+str(k)+' '+str(sum(np.multiply(act_movie2[j],act_movie2[k]))/act_movie_len[j])+'\n')
+					#print(str(j)+' '+str(k)+' '+str(len([0 for val in act_movie[rev_uniq_act[j]] if val in act_movie[rev_uniq_act[k]]])/act_movie_len[j])+'\n')
+					outfile.write(str(j)+' '+str(k)+' '+str(len([0 for val in act_movie[rev_uniq_act[j]] if val in act_movie[rev_uniq_act[k]]])/act_movie_len[j])+'\n')
 
 if __name__ == '__main__':
 	Q1()
