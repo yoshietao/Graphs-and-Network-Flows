@@ -1,3 +1,5 @@
+rm(list=ls())
+
 library(igraph)
 library(data.table)
 
@@ -13,47 +15,55 @@ for (filename in files){
   con=file(filename,open="r",encoding='ISO-8859-1')
   lines = readLines(con)
   for (l in lines){
-    tokens = unlist(strsplit (l, '\t\t'))
+    tokens = unlist(strsplit (trimws(l), '\t\t'))
     act = tokens[1]
     if (length(tokens)>=11) # at least 10 movie
     {
       mov = trimws(tokens [2:length(tokens)])
       mov = gsub ("(.+)\\s\\s.*", "\\1", mov)
-      data_list[[i]] <- data.table(A=act, M=mov)
+      data_list[[i]] <- data.table(name=act, movie=mov)
       i <- i+1 
     }
   }
   close (con)
 }
 
-DT <-rbindlist(data_list)
+dataDT <-rbindlist(data_list)
 # get rid of NA row 
 # DT = na.omit(DT)
-print (paste0("unique number of actor/actress: ", length (unique(DT$A))))
-print (paste0("unique number of movies: ", length (unique(DT$M))))
+print (paste0("unique number of actor/actress: ", length (unique(dataDT$name))))
+print (paste0("unique number of movies: ", length (unique(dataDT$movie))))
 
 # cleaned data in DT now 
-saveRDS(DT, file = "my_data.rds")
+saveRDS(dataDT, file = "my_data.rds")
 
 EndTime <-Sys.time()
 
 EndTime-StartTime
 
-DT <- readRDS(file = "my_data.rds")
-DT[,id:=match(A,unique(A))]
-id_DT <- unique (DT[,.(A,id), by = c("A","id")])
+dataDT <- readRDS(file = "my_data.rds")
+dataDT[,id:=match(name,unique(name))]
 
-DT[,A:=NULL]
-pair_DT = merge(DT, DT, by="M", allow.cartesian = TRUE)
-pair_DT[,M:=NULL]
-pair_DT <- pair_DT[,.(count = .N), by = .(id.x, id.y)]
-pair_DT[,weight := count / max(count), by = .(id.x)] 
-pair_DT <- pair_DT [id.x != id.y]
+idDT <- unique(dataDT[, .(name, id)], by = c("name", "id"))
+cat("Number of actors/actress: ", length(unique(dataDT$name)))
+cat("Number of movies: ", length(unique(dataDT$movie)))
 
-saveRDS(pair_DT, file = "pair_DT_data.rds")
 
-g <- graph_from_edgelist(as.matrix(pair_DT[,.(id.x,id.y)]))
-plot(degree.distribution(g, mode="in"), main=paste("Degree Distribution for in-degree for graph"), xlab="degree", ylab="frequency", cex = 0.7, cex.axis=0.8, cex.main=0.7)
+
+init2 <- Sys.time()
+
+dataDT[, name := NULL]
+
+pairDT <- merge(dataDT, dataDT, by = "movie", allow.cartesian = T)
+pairDT[, movie := NULL]
+pairDT <- pairDT[, .(count = .N), by = .(id.x, id.y)]
+pairDT[, wt := count / max(count), by = .(id.x)]
+pairDT <- pairDT[id.x != id.y]
+
+saveRDS(pairDT, paste0("wtData.rds"))
+
+g <- graph_from_edgelist(as.matrix(pairDT[, .(id.x, id.y)]))
+plot(degree.distribution(g, mode = "in"), main = paste("Degree Distribution for in-degree for graph"), xlab = "Degree", ylab = "Frequency", cex = 0.7, cex.axis = 0.8, cex.main = 0.7)
 
 getPairing <- function(nameToLookup, pairDT, idDT) {
   setorder(pairDT, id.x, -wt)
@@ -75,7 +85,7 @@ Sys.time()-init2
 init3 <-Sys.time()
 
 pageRank <- page_rank(g)
-saveRDS(pageRank, paste0(inputDir, "pageRank.rds"))
+saveRDS(pageRank, paste0("pageRank.rds"))
 
 ranking <- rank(-(pageRank$vector))
 top10Id <- match(c(1:10), ranking)
