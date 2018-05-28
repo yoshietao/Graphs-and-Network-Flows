@@ -20,7 +20,10 @@ for (filename in files){
     if (length(tokens)>=11) # at least 10 movie
     {
       mov = trimws(tokens [2:length(tokens)])
-      mov = gsub ("(.+)\\s\\s.*", "\\1", mov)
+      mov=mov[mov!=""]
+      #mov = gsub ("(.+)\\s\\s.*", "\\1", mov)
+      mov = strsplit(mov,'  ')
+      mov = unlist(lapply(mov, `[[`, 1))
       data_list[[i]] <- data.table(name=act, movie=mov)
       i <- i+1 
     }
