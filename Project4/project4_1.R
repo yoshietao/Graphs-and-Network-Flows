@@ -83,7 +83,11 @@ top10DT <- idDT[top10Id]
 top10DT <- merge(top10DT, dataDT[, .(numMovies = .N), by = .(id)], by = "id", sort = F)
 top10DT <- merge(top10DT, pairDT[, .(inDegree = .N), by = id.y], by.x = "id", by.y = "id.y", sort = F)
 
+# top 10 actor/actress and their page rank scores
+cbind(idDT[top10Id], data.table(pagerank = pageRank$vector[top10Id]))
+
 print("page rank time: ")
 Sys.time()-init3
 
+# top 10 actor/actress and their num movie and in degree
 top10DT
