@@ -38,6 +38,19 @@ g_sub <- induced.subgraph(g, which(clu$membership == which.max(clu$csize)))
 vcount(g_sub)
 ecount(g_sub)
 
-
-
+#Q7
+g_mst <- mst(g_sub)
+end_points <- list()
+i<-1
+total <- 0
+for (i in 1:10){
+  e <- E(g_mst)[i]
+  vs <- ends(g_mst, E(g_mst)[i])
+  end_points[[i]] <- c(V(g_mst)[vs[1]]$st_add,V(g_mst)[vs[2]]$st_add,e$mtt)
+  total <- total + e$mtt
+  i <- i+1
+}
+end_points
+total
+# Not so intuitive lol
 
