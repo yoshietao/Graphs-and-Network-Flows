@@ -2,11 +2,12 @@ library(igraph)
 library(data.table)
 library(rjson)
 
-DO_6 = FALSE
-DO_7 = FALSE
-DO_8 = TRUE
+DO_6 = TRUE
+DO_7 = TRUE
+DO_8 = FALSE
+DO_9 = TRUE
 
-setwd("/Users/evelyn/Documents/master_first_year/third_quarter/ECE232/Random-Graphs-and-Random-Walks/Project5/")
+#setwd("/Users/evelyn/Documents/master_first_year/third_quarter/ECE232/Random-Graphs-and-Random-Walks/Project5/")
 filename = 'san_francisco-censustracts-2017-4-All-MonthlyAggregate.csv'
 #filename = 'test.csv'
 
@@ -47,7 +48,7 @@ if (DO_6 == TRUE || DO_8 == TRUE){
 
 #Q7
 if (DO_7 == TRUE){
-  g_mst <- mst(g_sub)
+  g_mst <- mst(g_sub, weights = E(g_sub)$mtt)
   end_points <- list()
   i<-1
   total <- 0
@@ -101,3 +102,29 @@ if (DO_8 == TRUE){
   
   # return tri_ineq_true / (tri_ineq_true + tri_ineq_false)
 }
+
+#Q9---->I ignored the invalid path, so the total cost is smaller than it should be
+if(DO_9 == TRUE){
+  #visited <- c()
+  #next = 1
+  #g_mst_2 <- as.directed(g_mst, mode = "mutual")
+  g_dfs <- dfs(g_mst, root=1, neimode ="all")
+  g_order <- as.matrix(g_dfs$order)
+  cost <- 0.0
+  for(i in 1:(vcount(g_mst)-1)){
+    if(length(E(g_mst)[get.edge.ids(g_mst, c(g_order[i],g_order[i+1]))]$mtt)>0){
+      cost <- cost + E(g_mst)[get.edge.ids(g_mst, c(g_order[i],g_order[i+1]))]$mtt
+    }
+    #flush.console()
+    #cat(is.numeric(E(g_mst)[get.edge.ids(g_mst, c(g_order[i],g_order[i+1]))]$mtt),"\n")
+    #Sys.sleep(time=0.05)
+  }
+  cost
+}
+
+#Q10
+
+
+
+
+
