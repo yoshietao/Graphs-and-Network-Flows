@@ -37,6 +37,21 @@ V(g)$st_add <- as.matrix(geo[, .(geo_add)])
 V(g)$x <- as.matrix(geo[, .(geo_x)])
 V(g)$y <- as.matrix(geo[, .(geo_y)])
 # To access: V(g)[i]$y
+# calculate mean travel time/distance ratio to approximate missing data
+# de <- 0
+# nu <- 0
+# for(i in 1:100){
+#   for(j in i:100){
+#     d <- sqrt((V(g)[i]$x-V(g)[j]$x)^2+(V(g)[i]$y-V(g)[j]$y)^2)
+#     id <- get.edge.ids(g,c(i,j), directed=FALSE, error=FALSE)
+#     if(id != 0){
+#       de <- de + d
+#       nu <- nu + E(g)[id]$mtt
+#     }
+#   }
+# }
+# mtt_d_ratio <- nu/de
+mtt_d_ratio <- 6233.923
 
 #Q6:
 if (DO_6 == TRUE || DO_8 == TRUE){
@@ -103,7 +118,7 @@ if (DO_8 == TRUE){
   # return tri_ineq_true / (tri_ineq_true + tri_ineq_false)
 }
 
-#Q9---->I ignored the invalid path, so the total cost is smaller than it should be
+#Q9---->map missing path to time weighted shortest path(distance)
 if(DO_9 == TRUE){
   #visited <- c()
   #next = 1
@@ -115,9 +130,12 @@ if(DO_9 == TRUE){
     if(length(E(g_mst)[get.edge.ids(g_mst, c(g_order[i],g_order[i+1]))]$mtt)>0){
       cost <- cost + E(g_mst)[get.edge.ids(g_mst, c(g_order[i],g_order[i+1]))]$mtt
     }
-    #flush.console()
-    #cat(is.numeric(E(g_mst)[get.edge.ids(g_mst, c(g_order[i],g_order[i+1]))]$mtt),"\n")
-    #Sys.sleep(time=0.05)
+    else{
+      cost <- cost + mtt_d_ratio*sqrt((V(g_mst)[g_order[i]]$x-V(g_mst)[g_order[i+1]]$x)^2+(V(g_mst)[g_order[i]]$y-V(g_mst)[g_order[i+1]]$y)^2)
+      #flush.console()
+      #cat(sqrt((V(g_mst)[g_order[i]]$x-V(g_mst)[g_order[i+1]]$x)^2+(V(g_mst)[g_order[i]]$y-V(g_mst)[g_order[i+1]]$y)^2),"\n")
+      #Sys.sleep(time=0.05)
+    }
   }
   cost
 }
