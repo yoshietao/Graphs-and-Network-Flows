@@ -2,6 +2,11 @@ library(igraph)
 library(data.table)
 library(rjson)
 
+DO_6 = FALSE
+DO_7 = FALSE
+DO_8 = TRUE
+
+setwd("/Users/evelyn/Documents/master_first_year/third_quarter/ECE232/Random-Graphs-and-Random-Walks/Project5/")
 filename = 'san_francisco-censustracts-2017-4-All-MonthlyAggregate.csv'
 #filename = 'test.csv'
 
@@ -33,24 +38,66 @@ V(g)$y <- as.matrix(geo[, .(geo_y)])
 # To access: V(g)[i]$y
 
 #Q6:
-clu <- components(g)
-g_sub <- induced.subgraph(g, which(clu$membership == which.max(clu$csize)))
-vcount(g_sub)
-ecount(g_sub)
+if (DO_6 == TRUE || DO_8 == TRUE){
+  clu <- components(g)
+  g_sub <- induced.subgraph(g, which(clu$membership == which.max(clu$csize)))
+  vcount(g_sub)
+  ecount(g_sub)
+}
 
 #Q7
-g_mst <- mst(g_sub)
-end_points <- list()
-i<-1
-total <- 0
-for (i in 1:10){
-  e <- E(g_mst)[i]
-  vs <- ends(g_mst, E(g_mst)[i])
-  end_points[[i]] <- c(V(g_mst)[vs[1]]$st_add,V(g_mst)[vs[2]]$st_add,e$mtt)
-  total <- total + e$mtt
-  i <- i+1
+if (DO_7 == TRUE){
+  g_mst <- mst(g_sub)
+  end_points <- list()
+  i<-1
+  total <- 0
+  for (i in 1:10){
+    e <- E(g_mst)[i]
+    vs <- ends(g_mst, E(g_mst)[i])
+    end_points[[i]] <- c(V(g_mst)[vs[1]]$st_add,V(g_mst)[vs[2]]$st_add,e$mtt)
+    total <- total + e$mtt
+    i <- i+1
+  }
+  end_points
+  total
+  # Not so intuitive lol
 }
-end_points
-total
-# Not so intuitive lol
 
+#Q8
+if (DO_8 == TRUE){
+  triangles_index <- triangles(g_sub) # this will output a list of triangles, first three vertices represent first triangle...etc 
+  # pick 1000 from number of triangles
+  rand_1000_triangles_index <- sample(1:length(triangles_index)/3, 1000, replace=F)
+  length(rand_1000_triangles_index)
+  rand_1000_triangles <- c()
+  tri_ineq_true <- 0
+  tri_ineq_false <- 0
+  euc.dist <- function(x1, x2) sqrt(sum((x1 - x2) ^ 2))
+  for (t in rand_1000_triangles_index){
+    pt1 <- triangles_index[(t-1)*3+1]
+    pt2 <- triangles_index[(t-1)*3+2]
+    pt3 <- triangles_index[(t-1)*3+3]
+    v_list <- get.edge.ids(g_sub, c(pt1, pt2, pt1, pt3, pt2, pt3))
+    weights <- edge_attr(g_sub, "mtt", index = v_list)
+    # v_list = c(pt1,pt2,pt3)
+    # x_coord <- vertex_attr(g_sub, "x", v_list)
+    # y_coord <- vertex_attr(g_sub, "y", v_list)
+    # dist1_2 <- euc.dist(c(x_coord[1],y_coord[1]),c(x_coord[2],y_coord[2]))
+    # dist2_3 <- euc.dist(c(x_coord[2],y_coord[2]),c(x_coord[3],y_coord[3]))
+    # dist1_3 <- euc.dist(c(x_coord[1],y_coord[1]),c(x_coord[3],y_coord[3]))
+    # if (dist1_2 + dist2_3 > dist1_3 && dist1_2 + dist1_3 > dist2_3 && dist2_3 + dist1_3 > dist1_2){
+    #  tri_ineq_true <- tri_ineq_true + 1
+    #}
+    #else{
+    #  tri_ineq_false <- tri_ineq_false + 1
+    #}
+    if (weights[1]+weights[2]>weights[3] && weights[1]+weights[3]>weights[2] && weights[2]+weights[3]>weights[1])
+      tri_ineq_true <- tri_ineq_true + 1
+    else
+      tri_ineq_false <- tri_ineq_false + 1
+  }
+  tri_ineq_true
+  tri_ineq_false
+  
+  # return tri_ineq_true / (tri_ineq_true + tri_ineq_false)
+}
