@@ -40,8 +40,8 @@ V(g)$y <- as.matrix(geo[, .(geo_y)])
 # calculate mean travel time/distance ratio to approximate missing data
 # de <- 0
 # nu <- 0
-# for(i in 1:100){
-#   for(j in i:100){
+# for(i in 1:vcount(g)){
+#   for(j in i:vcount(g)){
 #     d <- sqrt((V(g)[i]$x-V(g)[j]$x)^2+(V(g)[i]$y-V(g)[j]$y)^2)
 #     id <- get.edge.ids(g,c(i,j), directed=FALSE, error=FALSE)
 #     if(id != 0){
@@ -50,7 +50,7 @@ V(g)$y <- as.matrix(geo[, .(geo_y)])
 #     }
 #   }
 # }
-# mtt_d_ratio <- nu/de
+#mtt_d_ratio <- nu/de
 mtt_d_ratio <- 6233.923
 
 #Q6:
@@ -122,22 +122,30 @@ if (DO_8 == TRUE){
 if(DO_9 == TRUE){
   #visited <- c()
   #next = 1
-  #g_mst_2 <- as.directed(g_mst, mode = "mutual")
+  g_mst_2 <- make_empty_graph(n = vcount(g_mst), directed = FALSE)
   g_dfs <- dfs(g_mst, root=1, neimode ="all")
   g_order <- as.matrix(g_dfs$order)
   cost <- 0.0
+  att_wt <- c()
   for(i in 1:(vcount(g_mst)-1)){
-    if(length(E(g_mst)[get.edge.ids(g_mst, c(g_order[i],g_order[i+1]))]$mtt)>0){
-      cost <- cost + E(g_mst)[get.edge.ids(g_mst, c(g_order[i],g_order[i+1]))]$mtt
+    g_mst_2 <- add_edges(g_mst_2,c(g_order[i],g_order[i+1]))
+    wt <- E(g_mst)[get.edge.ids(g_mst, c(g_order[i],g_order[i+1]))]$mtt
+    if(length(wt)>0){
+      cost <- cost + wt
+      att_wt <- c(att_wt,wt)
     }
     else{
-      cost <- cost + mtt_d_ratio*sqrt((V(g_mst)[g_order[i]]$x-V(g_mst)[g_order[i+1]]$x)^2+(V(g_mst)[g_order[i]]$y-V(g_mst)[g_order[i+1]]$y)^2)
+      wt <- mtt_d_ratio*sqrt((V(g_mst)[g_order[i]]$x-V(g_mst)[g_order[i+1]]$x)^2+(V(g_mst)[g_order[i]]$y-V(g_mst)[g_order[i+1]]$y)^2)
+      cost <- cost + wt
+      att_wt <- c(att_wt,wt)
       #flush.console()
       #cat(sqrt((V(g_mst)[g_order[i]]$x-V(g_mst)[g_order[i+1]]$x)^2+(V(g_mst)[g_order[i]]$y-V(g_mst)[g_order[i+1]]$y)^2),"\n")
       #Sys.sleep(time=0.05)
     }
   }
   cost
+  g_mst_2 <- set_edge_attr(g_mst_2,"weight", value = att_wt)
+  plot(g_mst_2,vertex.size=3, edge.label=E(g_mst_2)$weight, vertex.label=NA)
 }
 
 #Q10
