@@ -6,6 +6,7 @@ DO_6 = TRUE
 DO_7 = FALSE
 DO_8 = TRUE
 DO_9 = FALSE
+DO_11= TRUE
 
 #setwd("/Users/evelyn/Documents/master_first_year/third_quarter/ECE232/Random-Graphs-and-Random-Walks/Project5/")
 filename = 'san_francisco-censustracts-2017-4-All-MonthlyAggregate.csv'
@@ -133,12 +134,30 @@ if(DO_9 == TRUE){
     }
   }
   cost
+  #Q10
   g_mst_2 <- set_edge_attr(g_mst_2,"weight", value = att_wt)
   plot(g_mst_2,vertex.size=3, vertex.label=NA)
 }
 
-#Q10
+#Part 3
 
+if(DO_11){
+  X <- ppp(V(g_sub)$x, V(g_sub)$y, c(-150,150), c(-40,40))
+  d_X <- deldir(X)
+  plot(d_X)
+  
+  detail <- d_X$dirsgs
+  
+  eid_keep <- c()
+  for(i in 1:dim(detail)[1]){
+    eid <- get.edge.ids(g_sub, c(detail[i,5],detail[i,6]))
+    #if(eid != 0)
+    eid_keep <- c(eid_keep, eid)
+    #else
+    
+  }
+  g_3 <- subgraph.edges(g_sub, eid_keep[eid_keep!=0], delete.vertices = TRUE)
+}
 
 
 
