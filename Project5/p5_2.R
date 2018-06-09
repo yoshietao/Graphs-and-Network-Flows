@@ -13,6 +13,7 @@ filename = 'san_francisco-censustracts-2017-4-All-MonthlyAggregate.csv'
 
 MyData <- read.csv(file=filename, header=TRUE, sep=",")
 setDT(MyData)
+MyData <- MyData[month==12]
 
 json_file = 'san_francisco_censustracts.json'
 json_data <- fromJSON(file=json_file)
@@ -55,6 +56,7 @@ mtt_d_ratio <- 6233.923
 
 #Q6:
 if (DO_6 == TRUE || DO_8 == TRUE){
+  g <- simplify(g, remove.multiple = TRUE, remove.loops = TRUE, edge.attr.comb="mean")
   clu <- components(g)
   g_sub <- induced.subgraph(g, which(clu$membership == which.max(clu$csize)))
   vcount(g_sub)
@@ -145,7 +147,7 @@ if(DO_9 == TRUE){
   }
   cost
   g_mst_2 <- set_edge_attr(g_mst_2,"weight", value = att_wt)
-  plot(g_mst_2,vertex.size=3, edge.label=E(g_mst_2)$weight, vertex.label=NA)
+  plot(g_mst_2,vertex.size=3, vertex.label=NA)
 }
 
 #Q10
