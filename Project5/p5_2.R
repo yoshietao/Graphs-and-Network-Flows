@@ -1,9 +1,7 @@
 library(igraph)
 library(data.table)
 library(rjson)
-# install.packages("spatstat")
 library(spatstat)
-# install.packages("deldir")
 library(deldir)
 
 DO_6 = FALSE
@@ -138,7 +136,7 @@ if(DO_9 == TRUE){
       #Sys.sleep(time=0.05)
     }
   }
-  cost
+  cost <- cost + mtt_d_ratio*sqrt((V(g_mst)[g_order[1]]$x-V(g_mst)[g_order[1880]]$x)^2+(V(g_mst)[g_order[1]]$y-V(g_mst)[g_order[1880]]$y)^2)
   #Q10
   g_mst_2 <- set_edge_attr(g_mst_2,"weight", value = att_wt)
   plot(g_mst_2,vertex.size=3, vertex.label=NA)
