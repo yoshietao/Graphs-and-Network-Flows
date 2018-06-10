@@ -1,12 +1,17 @@
 library(igraph)
 library(data.table)
 library(rjson)
+# install.packages("spatstat")
+library(spatstat)
+# install.packages("deldir")
+library(deldir)
 
-DO_6 = TRUE
+DO_6 = FALSE
 DO_7 = FALSE
-DO_8 = TRUE
+DO_8 = FALSE
 DO_9 = FALSE
-DO_11= TRUE
+DO_11= FALSE
+DO_12 = TRUE
 
 #setwd("/Users/evelyn/Documents/master_first_year/third_quarter/ECE232/Random-Graphs-and-Random-Walks/Project5/")
 filename = 'san_francisco-censustracts-2017-4-All-MonthlyAggregate.csv'
@@ -56,7 +61,7 @@ V(g)$y <- as.matrix(geo[, .(geo_y)])
 mtt_d_ratio <- 6233.923
 
 #Q6:
-if (DO_6 == TRUE || DO_8 == TRUE){
+if (DO_6 == TRUE || DO_8 == TRUE || DO_11 == TRUE){
   g <- simplify(g, remove.multiple = TRUE, remove.loops = TRUE, edge.attr.comb="mean")
   clu <- components(g)
   g_sub <- induced.subgraph(g, which(clu$membership == which.max(clu$csize)))
@@ -141,7 +146,9 @@ if(DO_9 == TRUE){
 
 #Part 3
 
-if(DO_11){
+
+
+if(DO_11 || DO_12){
   X <- ppp(V(g_sub)$x, V(g_sub)$y, c(-150,150), c(-40,40))
   d_X <- deldir(X)
   plot(d_X)
@@ -157,6 +164,39 @@ if(DO_11){
     
   }
   g_3 <- subgraph.edges(g_sub, eid_keep[eid_keep!=0], delete.vertices = TRUE)
+  vcount(g_3)
+  ecount(g_3)
+  
+  # Q12
+  
+  euc.dist <- function(x1, x2) sqrt(sum((x1 - x2) ^ 2))
+  
+  car_length <- 0.003
+  mi_per_deg <- 69
+  bet_car_t <- 2
+  
+  num_car_per_hour <- c()
+  
+  for (e in 1:ecount(g_3)){
+  #for (e in 1:10){
+    # get two nodes on each side, and check location 
+    node_1_2 <- ends (g_3, e)
+    x_coord <- vertex_attr(g_3, "x", node_1_2)
+    y_coord <- vertex_attr(g_3, "y", node_1_2)
+    d <- euc.dist (c(x_coord[1], y_coord[1]), c(x_coord[2], y_coord[2]))
+    t <- edge_attr(g_3, "mtt", e)
+    speed <- d * mi_per_deg / t
+    t_per_car <- car_length / speed 
+    
+    # total time per car = time for between car and for car
+    total_t_car <- t_per_car + bet_car_t
+    # in hour
+    num_car_per_hour <- c(num_car_per_hour, 60*60/total_t_car)
+    
+  }
+  # list of num_car_per_hour for each edge, first is edge 1...etc 
+  num_car_per_hour 
+  length(num_car_per_hour)
 }
 
 
