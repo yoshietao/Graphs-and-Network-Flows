@@ -1,11 +1,13 @@
 library(igraph)
 library(data.table)
 library(rjson)
+library(deldir)
+library(spatstat)
 
 DO_6 = TRUE
-DO_7 = FALSE
+DO_7 = TRUE
 DO_8 = TRUE
-DO_9 = FALSE
+DO_9 = TRUE
 DO_11= TRUE
 
 #setwd("/Users/evelyn/Documents/master_first_year/third_quarter/ECE232/Random-Graphs-and-Random-Walks/Project5/")
@@ -133,7 +135,7 @@ if(DO_9 == TRUE){
       #Sys.sleep(time=0.05)
     }
   }
-  cost
+  cost <- cost + mtt_d_ratio*sqrt((V(g_mst)[g_order[1]]$x-V(g_mst)[g_order[1880]]$x)^2+(V(g_mst)[g_order[1]]$y-V(g_mst)[g_order[1880]]$y)^2)
   #Q10
   g_mst_2 <- set_edge_attr(g_mst_2,"weight", value = att_wt)
   plot(g_mst_2,vertex.size=3, vertex.label=NA)
@@ -158,7 +160,7 @@ if(DO_11){
   }
   g_3 <- subgraph.edges(g_sub, eid_keep[eid_keep!=0], delete.vertices = TRUE)
 }
-
+#
 
 
 
