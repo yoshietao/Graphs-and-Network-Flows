@@ -4,11 +4,11 @@ library(rjson)
 library(spatstat)
 library(deldir)
 
-DO_6 = FALSE
-DO_7 = FALSE
-DO_8 = FALSE
-DO_9 = FALSE
-DO_11= FALSE
+DO_6 = TRUE
+DO_7 = TRUE
+DO_8 = TRUE
+DO_9 = TRUE
+DO_11= TRUE
 DO_12 = TRUE
 
 #setwd("/Users/evelyn/Documents/master_first_year/third_quarter/ECE232/Random-Graphs-and-Random-Walks/Project5/")
@@ -139,7 +139,9 @@ if(DO_9 == TRUE){
   cost <- cost + mtt_d_ratio*sqrt((V(g_mst)[g_order[1]]$x-V(g_mst)[g_order[1880]]$x)^2+(V(g_mst)[g_order[1]]$y-V(g_mst)[g_order[1880]]$y)^2)
   #Q10
   g_mst_2 <- set_edge_attr(g_mst_2,"weight", value = att_wt)
-  plot(g_mst_2,vertex.size=3, vertex.label=NA)
+  coord <- data.frame(V(g_mst)$x,V(g_mst)$y)
+  coord <- as.matrix(coord)
+  plot(g_mst_2,vertex.size=3, vertex.label=NA, layout=coord)
 }
 
 #Part 3
@@ -147,23 +149,27 @@ if(DO_9 == TRUE){
 
 
 if(DO_11 || DO_12){
+  #Q11
   X <- ppp(V(g_sub)$x, V(g_sub)$y, c(-150,150), c(-40,40))
   d_X <- deldir(X)
-  plot(d_X)
+  #plot(d_X)
   
-  detail <- d_X$dirsgs
+  detail <- d_X$delsgs
   
-  eid_keep <- c()
+  g_3 <- make_empty_graph(n = vcount(g_sub), directed = FALSE)
+  #eid_keep <- c()
   for(i in 1:dim(detail)[1]){
-    eid <- get.edge.ids(g_sub, c(detail[i,5],detail[i,6]))
+    g_3 <- add_edges(g_3,c(detail[i,5],detail[i,6]))
+    #eid <- get.edge.ids(g_sub, c(detail[i,5],detail[i,6]))
     #if(eid != 0)
-    eid_keep <- c(eid_keep, eid)
+    #eid_keep <- c(eid_keep, eid)
     #else
-    
   }
-  g_3 <- subgraph.edges(g_sub, eid_keep[eid_keep!=0], delete.vertices = TRUE)
-  vcount(g_3)
-  ecount(g_3)
+  for(i in 1:vcount(g_3)){
+    V(g_3)[i]$x <- V(g_mst)[i]$x
+    V(g_3)[i]$y <- V(g_mst)[i]$y
+  }
+  plot(g_3,vertex.size=3, vertex.label=NA, layout=coord)
   
   # Q12
   
