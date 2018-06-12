@@ -42,29 +42,25 @@ V(g)$st_add <- as.matrix(geo[, .(geo_add)])
 V(g)$x <- as.matrix(geo[, .(geo_x)])
 V(g)$y <- as.matrix(geo[, .(geo_y)])
 # To access: V(g)[i]$y
-# calculate mean travel time/distance ratio to approximate missing data
-# de <- 0
-# nu <- 0
-# for(i in 1:vcount(g)){
-#   for(j in i:vcount(g)){
-#     d <- sqrt((V(g)[i]$x-V(g)[j]$x)^2+(V(g)[i]$y-V(g)[j]$y)^2)
-#     id <- get.edge.ids(g,c(i,j), directed=FALSE, error=FALSE)
-#     if(id != 0){
-#       de <- de + d
-#       nu <- nu + E(g)[id]$mtt
-#     }
-#   }
-# }
-#mtt_d_ratio <- nu/de
+
 mtt_d_ratio <- 6233.923
+
+get_weight <-function(g,i,j){
+  if(get.edge.ids(g,c(i,j))==0){
+    path <- shortest_paths(g, from = i, to = j, weights=E(g)$mtt)
+    tot <- 0
+    for(i in 1:(length(path)-1))
+      tot <- tot+E(g)[get.edge.ids(g,c(path$vpath[[1]][i],path$vpath[[1]][i+1]))]$mtt
+    return(tot)
+  }else
+    return(E(g)[get.edge.ids(g,c(i,j))]$mtt)
+}
 
 #Q6:
 if (DO_6 == TRUE || DO_8 == TRUE || DO_11 == TRUE){
   g <- simplify(g, remove.multiple = TRUE, remove.loops = TRUE, edge.attr.comb="mean")
   clu <- components(g)
   g_sub <- induced.subgraph(g, which(clu$membership == which.max(clu$csize)))
-  vcount(g_sub)
-  ecount(g_sub)
 }
 
 #Q7
@@ -82,7 +78,6 @@ if (DO_7 == TRUE){
   }
   end_points
   total
-  # Not so intuitive lol
 }
 
 #Q8
@@ -98,7 +93,9 @@ if (DO_8 == TRUE){
       random_two <- sample (neigh_list, size=2, replace=FALSE)
     }
     are.connected(g_sub, random_two[1], random_two[2])
+    #v_list <- c(get_weight(g_sub,v,random_two[1]),get_weight(g_sub,v,random_two[2]),get_weight(g_sub,random_two[2],random_two[1]))
     v_list <- get.edge.ids(g_sub, c(v, random_two[1], v, random_two[2], random_two[1], random_two[2]))
+    for(i in v_list)
     weights <- edge_attr(g_sub, "mtt", index = v_list)
     if (weights[1]+weights[2]>weights[3] && weights[1]+weights[3]>weights[2] && weights[2]+weights[3]>weights[1])
       tri_ineq_true <- tri_ineq_true + 1
@@ -108,6 +105,7 @@ if (DO_8 == TRUE){
   }
   tri_ineq_true
   tri_ineq_false
+  rate = tri_ineq_true/(tri_ineq_true+tri_ineq_false)
   
 }
 
