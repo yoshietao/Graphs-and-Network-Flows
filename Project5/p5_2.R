@@ -10,6 +10,7 @@ DO_8 = TRUE
 DO_9 = TRUE
 DO_11= TRUE
 DO_12 = TRUE
+DO_13 = TRUE
 
 #setwd("/Users/evelyn/Documents/master_first_year/third_quarter/ECE232/Random-Graphs-and-Random-Walks/Project5/")
 filename = 'san_francisco-censustracts-2017-4-All-MonthlyAggregate.csv'
@@ -231,6 +232,30 @@ if(DO_11 || DO_12){
   # list of num_car_per_hour for each edge, first is edge 1...etc
   num_car_per_hour
   length(num_car_per_hour)
+}
+
+if (DO_13){
+  traffic_flow <- function (path_list) {
+    l <- length(path_list$vpath[[1]])
+    sum <- 0
+    flow <- c()
+    for (i in 1: (l-1)){
+      node_1 = path_list$vpath[[1]][i]
+      node_2 = path_list$vpath[[1]][i+1]
+      e <- get.edge.ids(g_3, c(node_1,node_2))
+      flow <- c(flow, num_car_per_hour[e])
+    }
+    return (flow)
+  }
+  
+  source_addr <- "100 Campus Drive, Stanford"
+  dest_addr <- "700 Meder Street, Santa Cruz"
+  source_node <- match(source_addr, V(g_sub)$st_add)
+  dest_node <- match(dest_addr, V(g_sub)$st_add)
+  edge_connectivity(g_sub,source_node, dest_node)
+  d <- distances(g_3, source_node, dest_node, weights = num_car_per_hour)
+  path_list <- shortest_paths(g_3, source_node, dest_node, weights = num_car_per_hour)
+  traffic_list <- traffic_flow (path_list)
 }
 
 
