@@ -6,7 +6,7 @@ library(deldir)
 
 DO_6 = TRUE
 DO_7 = TRUE
-DO_8 = TRUE
+DO_8 = FALSE
 DO_9 = TRUE
 DO_11= TRUE
 DO_12 = TRUE
@@ -45,17 +45,6 @@ V(g)$y <- as.matrix(geo[, .(geo_y)])
 # To access: V(g)[i]$y
 
 mtt_d_ratio <- 6233.923
-
-get_weight <-function(g,i,j){
-  if(get.edge.ids(g,c(i,j))==0){
-    path <- shortest_paths(g, from = i, to = j, weights=E(g)$mtt)
-    tot <- 0
-    for(i in 1:(length(path)-1))
-      tot <- tot+E(g)[get.edge.ids(g,c(path$vpath[[1]][i],path$vpath[[1]][i+1]))]$mtt
-    return(tot)
-  }else
-    return(E(g)[get.edge.ids(g,c(i,j))]$mtt)
-}
 
 #Q6:
 if (DO_6 == TRUE || DO_8 == TRUE || DO_11 == TRUE){
@@ -112,8 +101,18 @@ if (DO_8 == TRUE){
 
 #Q9---->map missing path to time weighted shortest path(distance)
 if(DO_9 == TRUE){
-  #visited <- c()
-  #next = 1
+  
+  get_weight <-function(a,b){
+    if(get.edge.ids(g_sub,c(a,b))==0){
+      path <- shortest_paths(g_sub, from = a, to = b, weights=E(g_sub)$mtt)
+      tot <- 0
+      for(k in 1:(length(path$vpath[[1]])-1))
+        tot <- tot+E(g_sub)[get.edge.ids(g_sub,c(path$vpath[[1]][k],path$vpath[[1]][k+1]))]$mtt
+      return(tot)
+    }else
+      return(E(g_sub)[get.edge.ids(g_sub,c(a,b))]$mtt)
+  }
+  
   g_mst_2 <- make_empty_graph(n = vcount(g_mst), directed = FALSE)
   g_dfs <- dfs(g_mst, root=1, neimode ="all")
   g_order <- as.matrix(g_dfs$order)
@@ -127,12 +126,12 @@ if(DO_9 == TRUE){
       att_wt <- c(att_wt,wt)
     }
     else{
-      wt <- mtt_d_ratio*sqrt((V(g_mst)[g_order[i]]$x-V(g_mst)[g_order[i+1]]$x)^2+(V(g_mst)[g_order[i]]$y-V(g_mst)[g_order[i+1]]$y)^2)
+      #flush.console()
+      #cat(g_order[i]," ",g_order[i+1]," ",wt,"\n")
+      #Sys.sleep(time=0.05)
+      wt <- get_weight(g_order[i],g_order[i+1])
       cost <- cost + wt
       att_wt <- c(att_wt,wt)
-      #flush.console()
-      #cat(sqrt((V(g_mst)[g_order[i]]$x-V(g_mst)[g_order[i+1]]$x)^2+(V(g_mst)[g_order[i]]$y-V(g_mst)[g_order[i+1]]$y)^2),"\n")
-      #Sys.sleep(time=0.05)
     }
   }
   cost <- cost + mtt_d_ratio*sqrt((V(g_mst)[g_order[1]]$x-V(g_mst)[g_order[1880]]$x)^2+(V(g_mst)[g_order[1]]$y-V(g_mst)[g_order[1880]]$y)^2)
