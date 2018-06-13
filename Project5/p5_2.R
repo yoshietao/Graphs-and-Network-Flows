@@ -11,6 +11,7 @@ DO_9 = TRUE
 DO_11= TRUE
 DO_12 = TRUE
 DO_13 = TRUE
+DO_14 = TRUE
 
 #setwd("/Users/evelyn/Documents/master_first_year/third_quarter/ECE232/Random-Graphs-and-Random-Walks/Project5/")
 filename = 'san_francisco-censustracts-2017-4-All-MonthlyAggregate.csv'
@@ -214,6 +215,7 @@ if(DO_11 || DO_12){
       t <- edge_attr(g_sub, "mtt", e_sub)
       d <- euc.dist (c(x_coord[1], y_coord[1]), c(x_coord[2], y_coord[2]))
     }
+    t_list <- c(t_list, t)
     speed <- d * mi_per_deg / t
     t_per_car <- car_length / speed
 
@@ -228,6 +230,9 @@ if(DO_11 || DO_12){
   # list of num_car_per_hour for each edge, first is edge 1...etc
   num_car_per_hour
   length(num_car_per_hour)
+  
+  t_list 
+  length (t_list)
 }
 
 if (DO_13){
@@ -255,6 +260,20 @@ if (DO_13){
   max(traffic_list)
   flow <- max_flow(g_3, source_node, dest_node, capacity = num_car_per_hour)
   flow $value
+}
+
+if (DO_14){
+  golden_gate_bridge = list (c(-122.475, 37.806), c(-122.479, 37.83))
+  san_rafael_bridge = list(c(-122.501, 37.956), c(-122.387, 37.93))
+  san_mateo_bridge = list(c(-122.273, 37.563), c(-122.122, 37.627))
+  dambarton_bridge = list(c(-122.142, 37.486), c(-122.067, 37.54))
+  oakland_bay_bridge = list(c(-122.388, 37.788), c(-122.302,37.825))
+  
+  E(g_3)$time <- as.matrix(t_list)
+  plot(g_3,vertex.size=3, vertex.label=NA, layout=coord)
+  max_threshold = 1000 
+  delta_g_3 <- delete.edges(g_3, which(E(g_3)$time >= max_threshold))
+  plot(delta_g_3,vertex.size=3, vertex.label=NA, layout=coord)
 }
 
 
