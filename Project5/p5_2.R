@@ -170,9 +170,6 @@ if(DO_11 || DO_12){
   plot(g_3,vertex.size=3, vertex.label=NA, layout=coord)
   
   # Q12
-  
-  
-  
   euc.dist <- function(x1, x2) sqrt(sum((x1 - x2) ^ 2))
   
   totalpath_distance <- function (path_list) {
@@ -256,7 +253,7 @@ if (DO_13){
   path_list <- shortest_paths(g_3, source_node, dest_node, weights = num_car_per_hour)
   traffic_list <- traffic_flow (path_list)
   max(traffic_list)
-  edge_disjoint_paths(g_3, source_node, dest_node)
+  #edge_disjoint_paths(g_3, source_node, dest_node)
 }
 
 
