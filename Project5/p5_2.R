@@ -252,10 +252,12 @@ if (DO_13){
   dest_addr <- "700 Meder Street, Santa Cruz"
   source_node <- match(source_addr, V(g_sub)$st_add)
   dest_node <- match(dest_addr, V(g_sub)$st_add)
-  edge_connectivity(g_sub,source_node, dest_node)
+  edge_connectivity(g_3,source_node, dest_node)
   d <- distances(g_3, source_node, dest_node, weights = num_car_per_hour)
   path_list <- shortest_paths(g_3, source_node, dest_node, weights = num_car_per_hour)
   traffic_list <- traffic_flow (path_list)
+  max(traffic_list)
+  edge_disjoint_paths(g_3, source_node, dest_node)
 }
 
 
