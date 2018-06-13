@@ -6,7 +6,7 @@ library(deldir)
 
 DO_6 = TRUE
 DO_7 = TRUE
-DO_8 = TRUE
+DO_8 = FALSE
 DO_9 = TRUE
 DO_11= TRUE
 DO_12 = TRUE
@@ -258,6 +258,8 @@ if (DO_13){
   traffic_list <- traffic_flow (path_list)
   max(traffic_list)
   edge_disjoint_paths(g_3, source_node, dest_node)
+  flow <- max_flow(g_3, source_node, dest_node, capacity = num_car_per_hour)
+  flow $value
 }
 
 
