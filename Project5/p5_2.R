@@ -12,6 +12,7 @@ DO_11= TRUE
 DO_12 = TRUE
 DO_13 = TRUE
 DO_14 = TRUE
+DO_15 = TRUE
 
 #setwd("/Users/evelyn/Documents/master_first_year/third_quarter/ECE232/Random-Graphs-and-Random-Walks/Project5/")
 filename = 'san_francisco-censustracts-2017-4-All-MonthlyAggregate.csv'
@@ -71,23 +72,25 @@ if (DO_7 == TRUE){
   total
 }
 
-#Q8
-if (DO_8 == TRUE){
+# g is g_sub for Q8, g is delta_g_3 for Q15, e_attr is "mtt" for Q8, e_attr is $time for Q15
+# percentage_tri_ineq(g_sub, "mtt")
+# percentage_tri_ineq(delta_g_3, "time")
+percentage_tri_ineq <-function(g, e_attr){
   tri_ineq_true <- 0
   tri_ineq_false <- 0
   count <- 0
   while (count < 1000){
-    v <- sample(1:vcount(g_sub), 1, replace=FALSE)
-    neigh_list <- neighbors(g_sub, v)
+    v <- sample(1:vcount(g), 1, replace=FALSE)
+    neigh_list <- neighbors(g, v)
     random_two <- sample (neigh_list, size=2, replace=FALSE)
-    while ( (are.connected(g_sub, random_two[1], random_two[2]) == FALSE)){
+    while ( (are.connected(g, random_two[1], random_two[2]) == FALSE)){
       random_two <- sample (neigh_list, size=2, replace=FALSE)
     }
-    are.connected(g_sub, random_two[1], random_two[2])
+    are.connected(g, random_two[1], random_two[2])
     #v_list <- c(get_weight(g_sub,v,random_two[1]),get_weight(g_sub,v,random_two[2]),get_weight(g_sub,random_two[2],random_two[1]))
-    v_list <- get.edge.ids(g_sub, c(v, random_two[1], v, random_two[2], random_two[1], random_two[2]))
+    v_list <- get.edge.ids(g, c(v, random_two[1], v, random_two[2], random_two[1], random_two[2]))
     for(i in v_list)
-    weights <- edge_attr(g_sub, "mtt", index = v_list)
+      weights <- edge_attr(g, e_attr, index = v_list) # "mtt" for e_attr for Q8 
     if (weights[1]+weights[2]>weights[3] && weights[1]+weights[3]>weights[2] && weights[2]+weights[3]>weights[1])
       tri_ineq_true <- tri_ineq_true + 1
     else 
@@ -97,7 +100,11 @@ if (DO_8 == TRUE){
   tri_ineq_true
   tri_ineq_false
   rate = tri_ineq_true/(tri_ineq_true+tri_ineq_false)
-  
+}
+
+#Q8
+if (DO_8 == TRUE){
+  percentage_tri_ineq(g_sub, "mtt")
 }
 
 #Q9---->map missing path to time weighted shortest path(distance)
@@ -274,6 +281,17 @@ if (DO_14){
   max_threshold = 1000 
   delta_g_3 <- delete.edges(g_3, which(E(g_3)$time >= max_threshold))
   plot(delta_g_3,vertex.size=3, vertex.label=NA, layout=coord)
+  
+  # have to check the time for those bridges 
+  # get node id first 
+  # golden_node <- match(golden_gate_bridge[[1]], c(V(g_sub)$x, V(g_sub)$y))
+  # v <- (which(V(g_sub)$x ==golden_gate_bridge[[1]][1])) #can't find bridge in original graph
+  # e_list <- get.edge.ids(g_3, c(golden_gate_bridge[[1]], golden_gate_bridge[[2]]))
+  # edge_attr(g_3, "time", e_list)
+}
+
+if (DO_15){
+  percentage_tri_ineq(delta_g_3, "time")
 }
 
 
