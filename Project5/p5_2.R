@@ -192,54 +192,62 @@ if(DO_11 || DO_12){
     }
     return (sum)
   }
-
-  car_length <- 0.003
-  mi_per_deg <- 69
-  bet_car_t <- 2
-
-  num_car_per_hour <- c()
-  t_list <- c()
-  count <- 0
-
-  for (e in 1:ecount(g_3)){
-  # for (e in 1:10){
-    
-    # when edge weight isn't null in g_sub 
-    
-    # get two nodes on each side, and check location
-    node_1_2 <- ends (g_3, e)
-    x_coord <- vertex_attr(g_3, "x", node_1_2)
-    y_coord <- vertex_attr(g_3, "y", node_1_2)
-    # get edge id from original graph 
-    e_sub <- get.edge.ids(g_sub, node_1_2)
-    # if there's no edge in original graph, then we approx by shortest path 
-    if (e_sub == 0){
-      path_list <- shortest_paths(g_sub, node_1_2[1], node_1_2[2], weights = E(g_sub)$mtt)
-      t <- distances(g_sub, node_1_2[1], node_1_2[2], weights = E(g_sub)$mtt)
-      d <- totalpath_distance(path_list)
-    }
-    else {
-      t <- edge_attr(g_sub, "mtt", e_sub)
-      d <- euc.dist (c(x_coord[1], y_coord[1]), c(x_coord[2], y_coord[2]))
-    }
-    t_list <- c(t_list, t)
-    speed <- d * mi_per_deg / t
-    t_per_car <- car_length / speed
-
-    # total time per car = time for between car and for car
-    total_t_car <- t_per_car + bet_car_t
-    # in hour, times 2 because two on each side on the road
-    num_car_per_hour <- c(num_car_per_hour, 60*60/total_t_car*4)
-    
-    count <- count +1
-
-  }
-  # list of num_car_per_hour for each edge, first is edge 1...etc
-  num_car_per_hour
-  length(num_car_per_hour)
   
-  t_list 
-  length (t_list)
+  # g = g_3 for Q12, g = delta_g_3 for Q15 
+  get_car_per_hour <- function (g) {
+    # return car per hour vector for each edge 
+    car_length <- 0.003
+    mi_per_deg <- 69
+    bet_car_t <- 2
+    
+    num_car_per_hour <- c()
+    t_list <- c()
+    count <- 0
+    
+    for (e in 1:ecount(g)){
+      # for (e in 1:10){
+      
+      # when edge weight isn't null in g_sub 
+      
+      # get two nodes on each side, and check location
+      node_1_2 <- ends (g, e)
+      x_coord <- vertex_attr(g, "x", node_1_2)
+      y_coord <- vertex_attr(g, "y", node_1_2)
+      # get edge id from original graph 
+      e_sub <- get.edge.ids(g_sub, node_1_2)
+      # if there's no edge in original graph, then we approx by shortest path 
+      if (e_sub == 0){
+        path_list <- shortest_paths(g_sub, node_1_2[1], node_1_2[2], weights = E(g_sub)$mtt)
+        t <- distances(g_sub, node_1_2[1], node_1_2[2], weights = E(g_sub)$mtt)
+        d <- totalpath_distance(path_list)
+      }
+      else {
+        t <- edge_attr(g_sub, "mtt", e_sub)
+        d <- euc.dist (c(x_coord[1], y_coord[1]), c(x_coord[2], y_coord[2]))
+      }
+      t_list <- c(t_list, t)
+      speed <- d * mi_per_deg / t
+      t_per_car <- car_length / speed
+      
+      # total time per car = time for between car and for car
+      total_t_car <- t_per_car + bet_car_t
+      # in hour, times 2 because two on each side on the road
+      num_car_per_hour <- c(num_car_per_hour, 60*60/total_t_car*4)
+      
+      count <- count +1
+      
+    }
+    # list of num_car_per_hour for each edge, first is edge 1...etc
+    num_car_per_hour
+    length(num_car_per_hour)
+    
+    t_list 
+    length (t_list)
+    
+    return (num_car_per_hour)
+  }
+  
+  Q13_num_car_per_hour <- get_car_per_hour(g_3)
 }
 
 if (DO_13){
@@ -256,17 +264,21 @@ if (DO_13){
     return (flow)
   }
   
-  source_addr <- "100 Campus Drive, Stanford"
-  dest_addr <- "700 Meder Street, Santa Cruz"
-  source_node <- match(source_addr, V(g_sub)$st_add)
-  dest_node <- match(dest_addr, V(g_sub)$st_add)
-  edge_connectivity(g_3,source_node, dest_node)
-  d <- distances(g_3, source_node, dest_node, weights = num_car_per_hour)
-  path_list <- shortest_paths(g_3, source_node, dest_node, weights = num_car_per_hour)
-  traffic_list <- traffic_flow (path_list)
-  max(traffic_list)
-  flow <- max_flow(g_3, source_node, dest_node, capacity = num_car_per_hour)
-  flow $value
+  get_maxflow_stanford_to_cruz <- function (g,num_car_per_hour){
+    source_addr <- "100 Campus Drive, Stanford"
+    dest_addr <- "700 Meder Street, Santa Cruz"
+    source_node <- match(source_addr, V(g_sub)$st_add)
+    dest_node <- match(dest_addr, V(g_sub)$st_add)
+    edge_connectivity(g,source_node, dest_node)
+    d <- distances(g, source_node, dest_node, weights = num_car_per_hour)
+    path_list <- shortest_paths(g, source_node, dest_node, weights = num_car_per_hour)
+    # traffic_list <- traffic_flow (path_list)
+    # max(traffic_list)
+    flow <- max_flow(g, source_node, dest_node, capacity = num_car_per_hour)
+    flow $value
+  }
+  get_maxflow_stanford_to_cruz (g_3, Q13_num_car_per_hour)
+
 }
 
 if (DO_14){
@@ -285,13 +297,19 @@ if (DO_14){
   # have to check the time for those bridges 
   # get node id first 
   # golden_node <- match(golden_gate_bridge[[1]], c(V(g_sub)$x, V(g_sub)$y))
-  # v <- (which(V(g_sub)$x ==golden_gate_bridge[[1]][1])) #can't find bridge in original graph
+  # vertex_attr(g_sub, "x", 1)
+  # match(-122.2194, V(g_sub)$x)
+  # v <- (which(V(g_sub)$x ==-122.2194)) #can't find bridge in original graph
   # e_list <- get.edge.ids(g_3, c(golden_gate_bridge[[1]], golden_gate_bridge[[2]]))
   # edge_attr(g_3, "time", e_list)
 }
 
 if (DO_15){
-  percentage_tri_ineq(delta_g_3, "time")
+  # repeat Q12 
+  Q15_num_car_per_hour <- get_car_per_hour(delta_g_3)
+  
+  # repeat Q13 
+  get_maxflow_stanford_to_cruz (delta_g_3, Q15_num_car_per_hour)
 }
 
 
