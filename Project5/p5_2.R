@@ -1,3 +1,5 @@
+rm(list=ls())
+
 library(igraph)
 library(data.table)
 library(rjson)
@@ -244,10 +246,10 @@ if(DO_11 || DO_12){
     t_list 
     length (t_list)
     
-    return (num_car_per_hour)
+    return (list(num_car_per_hour, t_list))
   }
-  
-  Q13_num_car_per_hour <- get_car_per_hour(g_3)
+  Q13_get_car_per_hour_combined <- get_car_per_hour(g_3)
+  Q13_num_car_per_hour <- Q13_get_car_per_hour_combined[[1]]
 }
 
 if (DO_13){
@@ -288,6 +290,7 @@ if (DO_14){
   dambarton_bridge = list(c(-122.142, 37.486), c(-122.067, 37.54))
   oakland_bay_bridge = list(c(-122.388, 37.788), c(-122.302,37.825))
   
+  t_list <- Q13_get_car_per_hour_combined[[2]]
   E(g_3)$time <- as.matrix(t_list)
   plot(g_3,vertex.size=3, vertex.label=NA, layout=coord)
   max_threshold = 1000 
@@ -306,12 +309,9 @@ if (DO_14){
 
 if (DO_15){
   # repeat Q12 
-  Q15_num_car_per_hour <- get_car_per_hour(delta_g_3)
+  Q15_num_car_per_hour <- get_car_per_hour(delta_g_3)[[1]]
   
   # repeat Q13 
   get_maxflow_stanford_to_cruz (delta_g_3, Q15_num_car_per_hour)
 }
-
-
-
 
