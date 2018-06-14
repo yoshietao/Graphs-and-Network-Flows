@@ -233,8 +233,8 @@ if(DO_11 || DO_12){
       
       # total time per car = time for between car and for car
       total_t_car <- t_per_car + bet_car_t
-      # in hour, times 2 because two on each side on the road
-      num_car_per_hour <- c(num_car_per_hour, 60*60/total_t_car*4)
+      # in hour, times 2 because two on each direction on the road
+      num_car_per_hour <- c(num_car_per_hour, 60*60/total_t_car*2)
       
       count <- count +1
       
@@ -271,12 +271,12 @@ if (DO_13){
     dest_addr <- "700 Meder Street, Santa Cruz"
     source_node <- match(source_addr, V(g_sub)$st_add)
     dest_node <- match(dest_addr, V(g_sub)$st_add)
-    edge_connectivity(g,source_node, dest_node)
     d <- distances(g, source_node, dest_node, weights = num_car_per_hour)
     path_list <- shortest_paths(g, source_node, dest_node, weights = num_car_per_hour)
     # traffic_list <- traffic_flow (path_list)
     # max(traffic_list)
     flow <- max_flow(g, source_node, dest_node, capacity = num_car_per_hour)
+    edge_connectivity(g,source_node, dest_node)
     flow $value
   }
   get_maxflow_stanford_to_cruz (g_3, Q13_num_car_per_hour)
@@ -301,7 +301,7 @@ if (DO_14){
   # get node id first 
   # golden_node <- match(golden_gate_bridge[[1]], c(V(g_sub)$x, V(g_sub)$y))
   # vertex_attr(g_sub, "x", 1)
-  # match(-122.2194, V(g_sub)$x)
+  # match(-122.2194, round(V(g_sub)$x,4))
   # v <- (which(V(g_sub)$x ==-122.2194)) #can't find bridge in original graph
   # e_list <- get.edge.ids(g_3, c(golden_gate_bridge[[1]], golden_gate_bridge[[2]]))
   # edge_attr(g_3, "time", e_list)
@@ -313,5 +313,8 @@ if (DO_15){
   
   # repeat Q13 
   get_maxflow_stanford_to_cruz (delta_g_3, Q15_num_car_per_hour)
+  
+  # number of disjoint paths are also in the get_maxflow_stanford_to_cruz function 
+
 }
 
