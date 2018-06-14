@@ -290,6 +290,8 @@ if (DO_14){
   dambarton_bridge = list(c(-122.142, 37.486), c(-122.067, 37.54))
   oakland_bay_bridge = list(c(-122.388, 37.788), c(-122.302,37.825))
   
+  bridges = list(golden_gate_bridge, san_rafael_bridge, san_mateo_bridge, dambarton_bridge, oakland_bay_bridge)
+  
   t_list <- Q13_get_car_per_hour_combined[[2]]
   E(g_3)$time <- as.matrix(t_list)
   plot(g_3,vertex.size=3, vertex.label=NA, layout=coord)
@@ -298,13 +300,30 @@ if (DO_14){
   plot(delta_g_3,vertex.size=3, vertex.label=NA, layout=coord)
   
   # have to check the time for those bridges 
-  # get node id first 
-  # golden_node <- match(golden_gate_bridge[[1]], c(V(g_sub)$x, V(g_sub)$y))
-  # vertex_attr(g_sub, "x", 1)
-  # match(-122.2194, round(V(g_sub)$x,4))
-  # v <- (which(V(g_sub)$x ==-122.2194)) #can't find bridge in original graph
-  # e_list <- get.edge.ids(g_3, c(golden_gate_bridge[[1]], golden_gate_bridge[[2]]))
-  # edge_attr(g_3, "time", e_list)
+  # add the bridges to the new graph 
+  node_num <- vcount(delta_g_3)
+  new_graph <- delta_g_3
+  for (i in 1:length(bridges)){
+    new_graph <- add_vertices(new_graph, 1)
+    node_num <- node_num + 1
+    bridge_tmp <- bridges[[i]]
+    bridge_end_1 <- bridge_tmp[[1]]
+    bridge_end_2 <- bridge_tmp[[2]]
+    new_graph <- set_vertex_attr(new_graph, "x", node_num, bridge_end_1[1])
+    new_graph <- set_vertex_attr(new_graph, "y", node_num, bridge_end_1[2])
+    
+    new_graph <- add_vertices(new_graph, 1)
+    node_num <- node_num + 1
+    new_graph <- set_vertex_attr(new_graph, "x", node_num, bridge_end_2[1])
+    new_graph <- set_vertex_attr(new_graph, "y", node_num, bridge_end_2[2])
+    
+    new_graph <- add_edges(new_graph, c(node_num-1,node_num))
+  }
+  V(new_graph)$color <- "white" 
+  V(new_graph)$size <- 3
+  V(new_graph)$color[(vcount(delta_g_3)+1):node_num] <- "red"
+  
+  plot(new_graph, vertex.size=3, vertex.label=NA, layout=coord)
 }
 
 if (DO_15){
