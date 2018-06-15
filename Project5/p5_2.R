@@ -292,7 +292,11 @@ if (DO_14){
   E(g_3)$time <- as.matrix(t_list)
   plot(g_3,vertex.size=3, vertex.label=NA, layout=coord)
   max_threshold = 1000 
-  delta_g_3 <- delete.edges(g_3, which(E(g_3)$time >= max_threshold))
+  two_sd = 2 * sd(t_list)
+  mean_t_list = mean(t_list)
+  upper = mean_t_list + two_sd
+  lower = mean_t_list - two_sd
+  delta_g_3 <- delete.edges(g_3, which(E(g_3)$time >= upper))
   plot(delta_g_3,vertex.size=3, vertex.label=NA, layout=coord)
   
   # have to check the time for those bridges 
