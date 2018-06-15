@@ -168,10 +168,6 @@ if(DO_11 || DO_12){
   #eid_keep <- c()
   for(i in 1:dim(detail)[1]){
     g_3 <- add_edges(g_3,c(detail[i,5],detail[i,6]))
-    #eid <- get.edge.ids(g_sub, c(detail[i,5],detail[i,6]))
-    #if(eid != 0)
-    #eid_keep <- c(eid_keep, eid)
-    #else
   }
   for(i in 1:vcount(g_3)){
     V(g_3)[i]$x <- V(g_mst)[i]$x
@@ -303,6 +299,8 @@ if (DO_14){
   # add the bridges to the new graph 
   node_num <- vcount(delta_g_3)
   new_graph <- delta_g_3
+  E(new_graph)$color <- "black"
+  
   for (i in 1:length(bridges)){
     new_graph <- add_vertices(new_graph, 1)
     node_num <- node_num + 1
@@ -317,13 +315,16 @@ if (DO_14){
     new_graph <- set_vertex_attr(new_graph, "x", node_num, bridge_end_2[1])
     new_graph <- set_vertex_attr(new_graph, "y", node_num, bridge_end_2[2])
     
-    new_graph <- add_edges(new_graph, c(node_num-1,node_num))
+    new_graph <- add_edges(new_graph, c(node_num-1,node_num), color="red")
   }
-  V(new_graph)$color <- "white" 
-  V(new_graph)$size <- 3
-  V(new_graph)$color[(vcount(delta_g_3)+1):node_num] <- "red"
   
-  plot(new_graph, vertex.size=3, vertex.label=NA, layout=coord)
+  coord <- data.frame(V(new_graph)$x,V(new_graph)$y)
+  coord <- as.matrix(coord)
+  plot(new_graph, vertex.size=1, vertex.label=NA, layout=coord)
+  plot(delta_g_3, vertex.size=1, vertex.label=NA, layout=coord)
+  coord <- data.frame(V(g_3)$x,V(g_3)$y)
+  coord <- as.matrix(coord)
+  plot(g_3, vertex.size=1, vertex.label=NA, layout=coord)
 }
 
 if (DO_15){
